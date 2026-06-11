@@ -4,6 +4,12 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  'https://mdcoxcwtgveczzvbjwzx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kY294Y3d0Z3ZlY3p6dmJqd3p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDE4MTQsImV4cCI6MjA5NjcxNzgxNH0.CsfMpWulQPrizMRyzZVleSC17nIHtZVO2Ru_8H7kQgs'
+);
 import { 
   UploadCloud, 
   Trash, 
@@ -181,7 +187,7 @@ export default function ArchiveAddEdit({
   };
 
   // HANDLE MOCK FILE UPLOAD
-  const handleFileSelect = (targetFiles: FileList | null) => {
+  const handleFileSelect = async (targetFiles: FileList | null) => {
     if (!targetFiles || targetFiles.length === 0) return;
     const file = targetFiles[0];
 
@@ -199,20 +205,29 @@ export default function ArchiveAddEdit({
       return;
     }
 
-    // Convert to base64 URL dynamically
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64DataURL = e.target?.result as string;
-      setUploadedFile({
-        filename: file.name,
-        size: file.size,
-        url: base64DataURL,
-        uploadedAt: new Date().toISOString().replace("T", " ").substring(0, 16),
-        uploadedBy: currentUser.id,
-        type: file.type || (ext === "pdf" ? "application/pdf" : "image/jpeg")
-      });
-    };
-    reader.readAsDataURL(file);
+// Upload to Supabase Storage
+    const fileName = `${Date.now()}_${file.name}`;
+    const { error } = await supabase.storage
+      .from('dokumen-arsip')
+      .upload(fileName, file);
+    
+    if (error) {
+      setFormErrors({ ...formErrors, file: "Gagal mengupload file. Coba lagi." });
+      return;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('dokumen-arsip')
+      .getPublicUrl(fileName);
+
+    setUploadedFile({
+      filename: file.name,
+      size: file.size,
+      url: urlData.publicUrl,
+      uploadedAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+      uploadedBy: currentUser.id,
+      type: file.type || (ext === "pdf" ? "application/pdf" : "image/jpeg")
+    });
     
     // Clear error
     const errorsCopy = { ...formErrors };
