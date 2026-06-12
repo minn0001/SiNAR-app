@@ -704,7 +704,7 @@ export default function ArchiveList({
             {/* Document Render Area (Page Mockup) */}
             <div className="p-6 bg-[#F5F0E8] border-b border-[#E8DCC8] flex justify-center items-start overflow-auto flex-1 select-text max-h-[550px]">
               {(() => {
-                const isMockFile = !archiveToPreview.fileDokumen || !archiveToPreview.fileDokumen.url || archiveToPreview.fileDokumen.url.startsWith("/") || archiveToPreview.fileDokumen.url.includes("pdfobject.com") || !archiveToPreview.fileDokumen.url.startsWith("data:");
+                const isMockFile = !archiveToPreview.fileDokumen || !archiveToPreview.fileDokumen.url || archiveToPreview.fileDokumen.url.startsWith("/") || archiveToPreview.fileDokumen.url.includes("pdfobject.com");
                 
                 if (isMockFile) {
                   // Fallback: Format Indonesian Date and get current category templates
@@ -923,15 +923,17 @@ export default function ArchiveList({
                                 archiveToPreview.fileDokumen?.filename?.toLowerCase().endsWith(".png");
 
                 if (isPdf) {
+                  const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(archiveToPreview.fileDokumen.url)}&embedded=true`;
                   return (
-                    <iframe 
-                      src={archiveToPreview.fileDokumen.url} 
-                      width="100%" 
-                      height="500px" 
+                    <iframe
+                      src={googleViewerUrl}
+                      width="100%"
+                      height="500px"
                       style={{ borderRadius: "8px", border: "1px solid #E8DCC8" }}
                     />
                   );
-                } else if (isImage) {
+                }
+                  else if (isImage) {
                   return (
                     <img 
                       src={archiveToPreview.fileDokumen.url} 
