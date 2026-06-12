@@ -311,7 +311,7 @@ export default function ArchiveDetail({
             {/* Embbed Render Area */}
             <div className="p-4 bg-[#F5F0E8] border-2 border-[#E8DCC8] flex justify-center items-start overflow-auto max-h-[550px] min-h-[300px]">
               {(() => {
-                const isMockFile = !archive.fileDokumen || !archive.fileDokumen.url || archive.fileDokumen.url.startsWith("/") || archive.fileDokumen.url.includes("pdfobject.com") || !archive.fileDokumen.url.startsWith("data:");
+                const isMockFile = !archive.fileDokumen || !archive.fileDokumen.url || archive.fileDokumen.url.startsWith("/") || archive.fileDokumen.url.includes("pdfobject.com");
                 
                 if (isMockFile) {
                   // Fallback: Format Indonesian Date and get current category templates
