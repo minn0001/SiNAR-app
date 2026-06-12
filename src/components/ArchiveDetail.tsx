@@ -105,17 +105,13 @@ export default function ArchiveDetail({
   };
 
   const handleDownload = () => {
-    if (archive.fileDokumen?.url?.startsWith("data:")) {
-      const link = document.createElement("a");
-      link.href = archive.fileDokumen.url;
-      link.download = archive.fileDokumen.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      // Virtual download notification fallback
-      alert(`Berkas digital ${archive.fileDokumen.filename} (${(archive.fileDokumen.size / (1024 * 1024)).toFixed(2)} MB) berhasil diunduh secara aman lewat saluran transkripsi SSL.`);
-    }
+    const link = document.createElement("a");
+    link.href = archive.fileDokumen.url;
+    link.download = archive.fileDokumen.filename;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handlePrintTrigger = () => {
@@ -531,14 +527,20 @@ export default function ArchiveDetail({
 
                 if (isPdf) {
                   return (
-                    <iframe 
-                      src={archive.fileDokumen.url} 
-                      width="100%" 
-                      height="500px" 
-                      style={{ borderRadius: "8px", border: "1px solid #E8DCC8" }}
-                    />
-                  );
-                } else if (isImage) {
+                    <div className="w-full text-center space-y-3">
+                    <p className="text-xs text-[#718096]">PDF tidak dapat ditampilkan langsung. Klik tombol di bawah untuk membuka.</p>
+                    <a 
+                      href={archive.fileDokumen.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-block px-4 py-2 bg-[#C89B3C] text-white text-xs font-bold rounded-lg hover:bg-[#A67C2D] transition"
+      >
+        Buka Dokumen PDF
+      </a>
+    </div>
+  );
+}
+                else if (isImage) {
                   return (
                     <img 
                       src={archive.fileDokumen.url} 
