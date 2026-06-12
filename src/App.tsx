@@ -4,6 +4,12 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  'https://mdcoxcwtgveczzvbjwzx.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kY294Y3d0Z3ZlY3p6dmJqd3p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDE4MTQsImV4cCI6MjA5NjcxNzgxNH0.CsfMpWulQPrizMRyzZVleSC17nIHtZVO2Ru_8H7kQgs'
+);
 import Sidebar from "./components/Sidebar";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
@@ -30,11 +36,29 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<string>("LOGIN");
   const [activeArchiveId, setActiveArchiveId] = useState<string | null>(null);
   
-  const [allArchives, setAllArchives] = useState<Archive[]>(mockArchives);
+  const [allArchives, setAllArchives] = useState<Archive[]>([]);
+  const [loadingArchives, setLoadingArchives] = useState(true);
   const [allUsers, setAllUsers] = useState<User[]>(mockUsers);
   const [allAuditLogs, setAllAuditLogs] = useState<AuditLog[]>(mockAuditLogs);
   const [systemConfig, setSystemConfig] = useState<SystemConfig>(defaultSystemConfig);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  useEffect(() => {
+  const loadArchives = async () => {
+    const { data, error } = await supabase
+      .from('arsip')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (!error && data) {
+      setAllArchives(data.map((row: any) => row.data));
+    } else {
+      setAllArchives(mockArchives);
+    }
+    setLoadingArchives(false);
+  };
+  loadArchives();
+}, []);
 
   // --- SESSION TIMER STATE ---
   const [secondsRemaining, setSecondsRemaining] = useState<number>(SESSION_LIMIT);
@@ -131,42 +155,42 @@ export default function App() {
   };
 
   // Archive edits or creation saves
-  const handleSaveArchive = (archive: Archive) => {
-    if (!currentUser) return;
+  const handleSaveArchive = async (archive: Archive) => {
+  if (!currentUser) return;
 
-    let updatedArchives: Archive[];
-    const isNew = !allArchives.find((a) => a.id === archive.id);
+  const isNew = !allArchives.find((a) => a.id === archive.id);
 
-    if (isNew) {
-      updatedArchives = [archive, ...allArchives];
-      appendAuditLog("Tambah Arsip", archive.nomorArsip, currentUser);
-    } else {
-      updatedArchives = allArchives.map((a) => (a.id === archive.id ? archive : a));
-      appendAuditLog("Edit Arsip", archive.nomorArsip, currentUser);
-    }
+  if (isNew) {
+    await supabase.from('arsip').insert({ data: archive });
+    setAllArchives(prev => [archive, ...prev]);
+    appendAuditLog("Tambah Arsip", archive.nomorArsip, currentUser);
+  } else {
+    await supabase.from('arsip').update({ data: archive }).eq('data->>id', archive.id);
+    setAllArchives(prev => prev.map((a) => (a.id === archive.id ? archive : a)));
+    appendAuditLog("Edit Arsip", archive.nomorArsip, currentUser);
+  }
 
-    setAllArchives(updatedArchives);
-    handleNavigate("DAFTAR_ARSIP");
-  };
-
+  handleNavigate("DAFTAR_ARSIP");
+};
+  
   // Bulk actions or general state swaps
   const handleUpdateArchivesList = (updated: Archive[]) => {
     setAllArchives(updated);
   };
 
   // Delete gate action
-  const handleDeleteArchive = (id: string) => {
-    if (!currentUser) return;
-    const targetDoc = allArchives.find((a) => a.id === id);
-    if (!targetDoc) return;
+  const handleDeleteArchive = async (id: string) => {
+  if (!currentUser) return;
+  const targetDoc = allArchives.find((a) => a.id === id);
+  if (!targetDoc) return;
 
-    const freshList = allArchives.filter((a) => a.id !== id);
-    setAllArchives(freshList);
-    appendAuditLog("Hapus Arsip", `${targetDoc.nomorArsip} (${targetDoc.judulArsip})`, currentUser);
-    
-    alert(`Arsip ${targetDoc.judulArsip} berhasil dihapus permanen secara aman.`);
-    handleNavigate("DAFTAR_ARSIP");
-  };
+  await supabase.from('arsip').delete().eq('data->>id', id);
+  setAllArchives(prev => prev.filter((a) => a.id !== id));
+  appendAuditLog("Hapus Arsip", `${targetDoc.nomorArsip} (${targetDoc.judulArsip})`, currentUser);
+  
+  alert(`Arsip ${targetDoc.judulArsip} berhasil dihapus permanen secara aman.`);
+  handleNavigate("DAFTAR_ARSIP");
+};
 
   const handleUpdateUsers = (freshUsers: User[]) => {
     setAllUsers(freshUsers);
