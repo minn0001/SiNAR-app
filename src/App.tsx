@@ -130,7 +130,7 @@ export default function App() {
   };
 
   // Appends security logs to audit history
-  const appendAuditLog = (action: string, target: string, actor: User) => {
+  const appendAuditLog = async (action: string, target: string, actor: User) => {
     const freshLog: AuditLog = {
       id: `log-gen-${Date.now()}`,
       userId: actor.id,
@@ -138,11 +138,12 @@ export default function App() {
       userRole: actor.role,
       action: action,
       target: target,
-      ipAddress: "192.168.1.135", // simulated LAN Node IP
+      ipAddress: "192.168.1.135",
       device: "Browser Session / Safari Desktop",
       timestamp: new Date().toISOString().replace("T", " ").substring(0, 19)
     };
     setAllAuditLogs((prev) => [freshLog, ...prev]);
+    await supabase.from('audit_log').insert({ data: freshLog });
   };
 
   // Navigates and triggers soft updates
