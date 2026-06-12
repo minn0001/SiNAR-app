@@ -60,6 +60,20 @@ export default function App() {
   loadArchives();
 }, []);
 
+useEffect(() => {
+  const loadAuditLogs = async () => {
+    const { data, error } = await supabase
+      .from('audit_log')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (!error && data && data.length > 0) {
+      setAllAuditLogs(data.map((row: any) => row.data));
+    }
+  };
+  loadAuditLogs();
+}, []);
+  
   // --- SESSION TIMER STATE ---
   const [secondsRemaining, setSecondsRemaining] = useState<number>(SESSION_LIMIT);
   const [showTimeoutModal, setShowTimeoutModal] = useState<boolean>(false);
