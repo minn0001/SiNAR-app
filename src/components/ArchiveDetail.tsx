@@ -526,20 +526,16 @@ export default function ArchiveDetail({
                                 archive.fileDokumen?.filename?.toLowerCase().endsWith(".png");
 
                 if (isPdf) {
-                  return (
-                    <div className="w-full text-center space-y-3">
-                    <p className="text-xs text-[#718096]">PDF tidak dapat ditampilkan langsung. Klik tombol di bawah untuk membuka.</p>
-                    <a 
-                      href={archive.fileDokumen.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-block px-4 py-2 bg-[#C89B3C] text-white text-xs font-bold rounded-lg hover:bg-[#A67C2D] transition"
-      >
-        Buka Dokumen PDF
-      </a>
-    </div>
-  );
-}
+                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(archive.fileDokumen.url)}&embedded=true`;
+                 return (
+                   <iframe
+                     src={googleViewerUrl}
+                     width="100%"
+                     height="500px"
+                     style={{ borderRadius: "8px", border: "1px solid #E8DCC8" }}
+                   />
+                 );
+               }
                 else if (isImage) {
                   return (
                     <img 
