@@ -126,6 +126,10 @@ export default function Dashboard({
   const usedGB = (usedSizeBytes / (1024 * 1024 * 1024)).toFixed(1);
   const storagePercentage = Math.min(100, (parseFloat(usedGB) / totalGB) * 100);
 
+  if (archives.length === 0) {
+    return <div>Loading... ({archives.length} arsip)</div>;
+  }
+  
   return (
     <div className="space-y-6">
       {/* Top Welcome Panel */}
