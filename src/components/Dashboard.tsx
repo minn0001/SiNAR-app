@@ -54,6 +54,8 @@ export default function Dashboard({
   const totalAkta = aktaAJB + aktaAPP;
   const totalPerjanjian = archives.filter(a => a.kategori === KategoriArsip.PERJANJIAN).length;
   const totalSuratKuasa = archives.filter(a => a.kategori === KategoriArsip.SURAT_KUASA).length;
+  const totalSertifikat = archives.filter(a => a.kategori === KategoriArsip.SERTIFIKAT).length;
+  const totalDokumenPendukung = archives.filter(a => a.kategori === KategoriArsip.DOKUMEN_PENDUKUNG).length;
   
   // Calculate warning retention (under 180 days)
   const totalRetensiWarning = retentionUrgentList.length;
@@ -141,7 +143,7 @@ export default function Dashboard({
       </div>
 
       {/* --- STATISTICS COUNTER CARDS --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
         {/* Total Arsip */}
         <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
           <div className="flex justify-between items-start">
@@ -180,7 +182,7 @@ export default function Dashboard({
 
         {/* Arsip Surat Kuasa */}
         <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
-          <div className="flex justify-between items-start">
+         <div className="flex justify-between items-start">
             <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Surat Kuasa</span>
             <span className="p-2 rounded-lg bg-sky-50 text-sky-600 border border-sky-100">
               <FileKey className="w-5 h-5" />
@@ -190,6 +192,30 @@ export default function Dashboard({
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-sky-500/5 rounded-full blur-xl pointer-events-none" />
         </div>
 
+        {/* Sertifikat */}
+        <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
+         <div className="flex justify-between items-start">
+            <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Sertifikat</span>
+            <span className="p-2 rounded-lg bg-amber-50 text-amber-600 border border-amber-100">
+              <FileText className="w-5 h-5" />
+            </span>
+          </div>
+          <div className="text-3xl font-bold font-display text-[#0B1F3A]">{totalSertifikat} <span className="text-xs text-[#718096]">berkas</span></div>
+          <div className="absolute right-0 bottom-0 w-24 h-24 bg-amber-500/5 rounded-full blur-xl pointer-events-none" />
+          </div>
+
+        {/* Dokumen Pendukung */}
+        <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
+         <div className="flex justify-between items-start">
+            <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Dok. Pendukung</span>
+            <span className="p-2 rounded-lg bg-slate-50 text-slate-600 border border-slate-100">
+              <FileText className="w-5 h-5" />
+            </span>
+          </div>
+          <div className="text-3xl font-bold font-display text-[#0B1F3A]">{totalDokumenPendukung} <span className="text-xs text-[#718096]">berkas</span></div>
+          <div className="absolute right-0 bottom-0 w-24 h-24 bg-slate-500/5 rounded-full blur-xl pointer-events-none" />
+          </div>
+        
         {/* Clickable Retention Warning */}
         <button
           onClick={() => onNavigate("ARSIP_MENDEKATI_RETENSI")}
