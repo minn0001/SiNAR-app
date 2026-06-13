@@ -384,13 +384,12 @@ useEffect(() => {
 
       {/* Toast Notification */}
       {toast && (
-       <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-semibold transition-all duration-300 animate-fadeIn ${
-         toast.type === "success" ? "bg-emerald-500" : "bg-red-500"
-       }`}>
-         <span className="text-lg">{toast.type === "success" ? "✅" : "❌"}</span>
-         {toast.message}
-       </div>
-      )}
+       <div className={`fixed bottom-6 right-6 z-50 flex items-center px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-semibold transition-all duration-300 animate-fadeIn ${
+    toast.type === "success" ? "bg-emerald-500" : "bg-red-500"
+  }`}>
+    {toast.message}
+  </div>
+)}
       
       {/* Session warning Dialog */}
       {currentUser && (
