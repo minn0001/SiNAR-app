@@ -192,6 +192,8 @@ export default function Dashboard({
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-sky-500/5 rounded-full blur-xl pointer-events-none" />
         </div>
 
+       </div>
+        
       {/* Baris 2 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
         
