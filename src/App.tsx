@@ -42,6 +42,26 @@ export default function App() {
   const [allAuditLogs, setAllAuditLogs] = useState<AuditLog[]>(mockAuditLogs);
   const [systemConfig, setSystemConfig] = useState<SystemConfig>(defaultSystemConfig);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+  setToast({ message, type });
+  setTimeout(() => setToast(null), 3000);
+};
+  const handleSaveArchive = async (archive: Archive) => {
+  if (!currentUser) return;
+  const isNew = !allArchives.find((a) => a.id === archive.id);
+  if (isNew) {
+    await supabase.from('arsip').insert({ data: archive });
+    setAllArchives(prev => [archive, ...prev]);
+    appendAuditLog("Tambah Arsip", archive.nomorArsip, currentUser);
+  } else {
+    await supabase.from('arsip').update({ data: archive }).eq('data->>id', archive.id);
+    setAllArchives(prev => prev.map((a) => (a.id === archive.id ? archive : a)));
+    appendAuditLog("Edit Arsip", archive.nomorArsip, currentUser);
+  }
+  handleNavigate("DAFTAR_ARSIP");
+  showToast("Arsip berhasil disimpan! Dokumen telah tersimpan di sistem SiNAR.");
+};
 
   useEffect(() => {
   const loadArchives = async () => {
@@ -377,6 +397,16 @@ useEffect(() => {
         </main>
       </div>
 
+      {/* Toast Notification */}
+      {toast && (
+       <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-semibold transition-all duration-300 animate-fadeIn ${
+         toast.type === "success" ? "bg-emerald-500" : "bg-red-500"
+       }`}>
+         <span className="text-lg">{toast.type === "success" ? "✅" : "❌"}</span>
+         {toast.message}
+       </div>
+      )}
+      
       {/* Session warning Dialog */}
       {currentUser && (
         <SessionTimeoutModal
