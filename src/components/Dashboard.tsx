@@ -143,7 +143,7 @@ export default function Dashboard({
       </div>
 
       {/* --- STATISTICS COUNTER CARDS --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
         {/* Total Arsip */}
         <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
           <div className="flex justify-between items-start">
@@ -192,6 +192,9 @@ export default function Dashboard({
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-sky-500/5 rounded-full blur-xl pointer-events-none" />
         </div>
 
+      {/* Baris 2 */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+        
         {/* Sertifikat */}
         <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
          <div className="flex justify-between items-start">
