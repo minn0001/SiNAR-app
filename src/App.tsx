@@ -112,14 +112,22 @@ useEffect(() => {
 
   // --- MUTATION EVENTS & ACTIONS ---
 
-  const handleLoginSuccess = (user: User) => {
+  const handleLoginSuccess = async (user: User) => {
     setCurrentUser(user);
     setCurrentPage("DASHBOARD");
     setSecondsRemaining(SESSION_LIMIT);
     setShowTimeoutModal(false);
-
-    // Track login activity
-    appendAuditLog("Login", "Sistem", user);
+    await appendAuditLog("Login", "Sistem", user);
+    
+    // Reload audit logs from Supabase after login
+    const { data, error } = await supabase
+      .from('audit_log')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (!error && data && data.length > 0) {
+      setAllAuditLogs(data.map((row: any) => row.data));
+    }
   };
 
   const handleLogout = () => {
