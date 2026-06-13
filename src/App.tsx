@@ -47,21 +47,6 @@ export default function App() {
   setToast({ message, type });
   setTimeout(() => setToast(null), 3000);
 };
-  const handleSaveArchive = async (archive: Archive) => {
-  if (!currentUser) return;
-  const isNew = !allArchives.find((a) => a.id === archive.id);
-  if (isNew) {
-    await supabase.from('arsip').insert({ data: archive });
-    setAllArchives(prev => [archive, ...prev]);
-    appendAuditLog("Tambah Arsip", archive.nomorArsip, currentUser);
-  } else {
-    await supabase.from('arsip').update({ data: archive }).eq('data->>id', archive.id);
-    setAllArchives(prev => prev.map((a) => (a.id === archive.id ? archive : a)));
-    appendAuditLog("Edit Arsip", archive.nomorArsip, currentUser);
-  }
-  handleNavigate("DAFTAR_ARSIP");
-  showToast("Arsip berhasil disimpan! Dokumen telah tersimpan di sistem SiNAR.");
-};
 
   useEffect(() => {
   const loadArchives = async () => {
