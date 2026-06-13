@@ -162,7 +162,7 @@ useEffect(() => {
       target: target,
       ipAddress: "192.168.1.135",
       device: "Browser Session / Safari Desktop",
-      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19)
+      timestamp: new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta", hour12: false }).replace(/\//g, "-").replace(",", "")
     };
     setAllAuditLogs((prev) => [freshLog, ...prev]);
     await supabase.from('audit_log').insert({ data: freshLog });
