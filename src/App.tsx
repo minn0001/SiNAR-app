@@ -197,7 +197,7 @@ useEffect(() => {
     setAllArchives(prev => prev.map((a) => (a.id === archive.id ? archive : a)));
     appendAuditLog("Edit Arsip", archive.nomorArsip, currentUser);
   }
-  showToast("Arsip berhasil disimpan! Dokumen telah tersimpan di sistem SiNAR.");
+  showToast("Dokumen berhasil disimpan.");
   handleNavigate("DAFTAR_ARSIP");
 };
   
