@@ -248,6 +248,9 @@ useEffect(() => {
   const renderPageLayout = () => {
     switch (currentPage) {
       case "DASHBOARD":
+        if (loadingArchives) {
+          return <div className="flex items-center justify-center h-64 text-[#718096] text-sm">Memuat data arsip...</div>;
+        }
         return (
           <Dashboard
             archives={allArchives}
