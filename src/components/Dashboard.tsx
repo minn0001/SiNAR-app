@@ -51,7 +51,6 @@ export default function Dashboard({
   const totalArsip = archives.length;
   const aktaAJB = archives.filter(a => a.kategori === KategoriArsip.AKTA_JUAL_BELI).length;
   const aktaAPP = archives.filter(a => a.kategori === KategoriArsip.AKTA_PENDIRIAN_PERUSAHAAN).length;
-  const totalAkta = aktaAJB + aktaAPP;
   const totalPerjanjian = archives.filter(a => a.kategori === KategoriArsip.PERJANJIAN).length;
   const totalSuratKuasa = archives.filter(a => a.kategori === KategoriArsip.SURAT_KUASA).length;
   const totalSertifikat = archives.filter(a => a.kategori === KategoriArsip.SERTIFIKAT).length;
@@ -156,28 +155,28 @@ export default function Dashboard({
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-gold-royal/5 rounded-full blur-xl pointer-events-none group-hover:bg-gold-royal/10 transition-all" />
         </div>
 
-        {/* Arsip Akta */}
+        {/* Akta Jual Beli */}
         <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
           <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Arsip Akta</span>
+            <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Akta Jual Beli</span>
             <span className="p-2 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100">
               <FileText className="w-5 h-5" />
             </span>
           </div>
-          <div className="text-3xl font-bold font-display text-[#0B1F3A]">{totalAkta} <span className="text-xs text-[#718096]">berkas</span></div>
+          <div className="text-3xl font-bold font-display text-[#0B1F3A]">{aktaAJB} <span className="text-xs text-[#718096]">berkas</span></div>
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
         </div>
 
-        {/* Arsip Perjanjian */}
+        {/* Akta Pendirian Perusahaan */}
         <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
           <div className="flex justify-between items-start">
-            <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Perjanjian</span>
-            <span className="p-2 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">
-              <FileSignature className="w-5 h-5" />
+            <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Akta Pendirian</span>
+            <span className="p-2 rounded-lg bg-violet-50 text-violet-600 border border-violet-100">
+              <FileText className="w-5 h-5" />
             </span>
           </div>
-          <div className="text-3xl font-bold font-display text-[#0B1F3A]">{totalPerjanjian} <span className="text-xs text-[#718096]">berkas</span></div>
-          <div className="absolute right-0 bottom-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+          <div className="text-3xl font-bold font-display text-[#0B1F3A]">{aktaAPP} <span className="text-xs text-[#718096]">berkas</span></div>
+          <div className="absolute right-0 bottom-0 w-24 h-24 bg-violet-500/5 rounded-full blur-xl pointer-events-none" />
         </div>
 
         {/* Arsip Surat Kuasa */}
@@ -191,11 +190,23 @@ export default function Dashboard({
           <div className="text-3xl font-bold font-display text-[#0B1F3A]">{totalSuratKuasa} <span className="text-xs text-[#718096]">berkas</span></div>
           <div className="absolute right-0 bottom-0 w-24 h-24 bg-sky-500/5 rounded-full blur-xl pointer-events-none" />
         </div>
-
+        
        </div>
         
       {/* Baris 2 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
+
+         {/* Arsip Perjanjian */}
+        <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
+          <div className="flex justify-between items-start">
+            <span className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">Perjanjian</span>
+            <span className="p-2 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">
+              <FileSignature className="w-5 h-5" />
+            </span>
+          </div>
+          <div className="text-3xl font-bold font-display text-[#0B1F3A]">{totalPerjanjian} <span className="text-xs text-[#718096]">berkas</span></div>
+          <div className="absolute right-0 bottom-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none" />
+        </div>
         
         {/* Sertifikat */}
         <div className="bg-white p-5 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] relative overflow-hidden flex flex-col justify-between h-32 group hover:border-gold-royal/40 transition">
