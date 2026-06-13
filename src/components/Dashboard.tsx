@@ -122,8 +122,8 @@ export default function Dashboard({
     const size = Number(a.fileDokumen?.size) || 0;
     return acc + size;
   }, 0);
-  const usedGB = (usedSizeBytes / (1024 * 1024 * 1024)).toFixed(1);
   const totalGB = 10;
+  const usedGB = (usedSizeBytes / (1024 * 1024 * 1024)).toFixed(1);
   const storagePercentage = Math.min(100, (parseFloat(usedGB) / totalGB) * 100);
 
   return (
