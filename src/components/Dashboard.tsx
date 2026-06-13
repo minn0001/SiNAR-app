@@ -119,6 +119,9 @@ export default function Dashboard({
 
   // Calculate used storage: let's sum file size of all archives, plus base simulation
   const usedSizeBytes = archives.reduce((acc, a) => {
+  console.log("Archives:", archives);
+  console.log("Sizes:", archives.map(a => a.fileDokumen?.size));
+  console.log("Total bytes:", usedSizeBytes);
     const size = Number(a.fileDokumen?.size) || 0;
     return acc + size;
   }, 0);
