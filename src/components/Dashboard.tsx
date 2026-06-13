@@ -118,7 +118,10 @@ export default function Dashboard({
     .slice(0, 5);
 
   // Calculate used storage: let's sum file size of all archives, plus base simulation
-  const usedSizeBytes = archives.reduce((acc, a) => acc + (a.fileDokumen?.size || 0), 0);
+  const usedSizeBytes = archives.reduce((acc, a) => {
+    const size = Number(a.fileDokumen?.size) || 0;
+    return acc + size;
+  }, 0);
   const usedGB = (usedSizeBytes / (1024 * 1024 * 1024)).toFixed(1);
   const totalGB = 10;
   const storagePercentage = Math.min(100, (parseFloat(usedGB) / totalGB) * 100);
