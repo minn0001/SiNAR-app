@@ -502,34 +502,34 @@ export default function ArchiveAddEdit({
               </div>
             </div>
 
-            {/* Keterangan */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
-                Keterangan Dokumen
-              </label>
-              <textarea
-                rows={3}
-                placeholder="Rincian deskripsi, letak fisik lemari / rak, catatan khusus, dll."
-                value={keterangan}
-                onChange={(e) => setKeterangan(e.target.value)}
-                className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] placeholder-[#A0AEC0]"
-              />
-            </div>
-          </div>
-        </div>
-            {/* Lokasi Fisik */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
-                Lokasi Penyimpanan Fisik
-              </label>
-              <input
-                type="text"
-                placeholder="cth: L1-R3-B12"
-                value={lokasiFisik}
-                onChange={(e) => setLokasiFisik(e.target.value)}
-                className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] font-mono placeholder-[#A0AEC0]"
-              />
-              <span className="text-[9px] text-[#718096] leading-none">Format: Lemari-Rak-Box (cth: L1-R3-B12)</span>
+            {/* Keterangan & Lokasi Fisik */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
+                  Keterangan Dokumen
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Rincian deskripsi, catatan khusus, dll."
+                  value={keterangan}
+                  onChange={(e) => setKeterangan(e.target.value)}
+                  className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] placeholder-[#A0AEC0]"
+                />
+              </div>
+            
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
+                  Lokasi Fisik
+                </label>
+                <input
+                  type="text"
+                  placeholder="L1-R3-B12"
+                  value={lokasiFisik}
+                  onChange={(e) => setLokasiFisik(e.target.value)}
+                  className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] font-mono placeholder-[#A0AEC0]"
+                />
+                <span className="text-[9px] text-[#718096] leading-none block">Format: Lemari-Rak-Box</span>
+              </div>
             </div>
         
         {/* RIGHT COLUMN: METADATA, VERSION & UPLOAD */}
