@@ -525,7 +525,7 @@ export default function ArchiveAddEdit({
                   type="text"
                   placeholder="L1-R3-B12"
                   value={lokasiFisik}
-                  onChange={(e) => setLokasiFisik(e.target.value)}
+                  onChange={(e) => setLokasiFisik(e.target.value.toUpperCase())}
                   className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] font-mono placeholder-[#A0AEC0]"
                 />
                 <span className="text-[9px] text-[#718096] leading-none block">Format: Lemari-Rak-Box</span>
