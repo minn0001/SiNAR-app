@@ -255,6 +255,14 @@ export default function ArchiveDetail({
               </div>
             </div>
 
+            {/* Lokasi Fisik */}
+            <div className="space-y-2 pt-2 text-xs">
+              <span className="text-[#718096] font-mono uppercase block">LOKASI PENYIMPANAN FISIK :</span>
+              <div className="bg-[#FAFAF8] p-3.5 rounded-lg border border-[#E8DCC8] leading-relaxed text-[#0B1F3A] font-mono font-bold">
+                {archive.lokasiFisik || "Belum ditentukan"}
+              </div>
+            </div>
+
             {/* Tags badges render */}
             <div className="space-y-2 pt-2">
               <span className="text-[#718096] text-xs font-semibold uppercase tracking-wider block">Label Kearsipan (Tags) :</span>
