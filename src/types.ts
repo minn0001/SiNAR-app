@@ -62,6 +62,7 @@ export interface Archive {
   namaKlien: string;
   unitPengolah: string;
   keterangan: string;
+  lokasiFisik?: string;
   fileDokumen: DocumentFile;
   versiDokumen: DocumentVersion[];
   qrCode: string; // auto-generated from archive ID or number
