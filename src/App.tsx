@@ -71,6 +71,15 @@ useEffect(() => {
       .from('audit_log')
       .select('*')
       .order('created_at', { ascending: false });
+
+    useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const archiveId = params.get('archive');
+  if (archiveId && currentUser) {
+    setActiveArchiveId(archiveId);
+    setCurrentPage("DETAIL_ARSIP");
+  }
+}, [currentUser, allArchives]);
     
     if (!error && data && data.length > 0) {
       setAllAuditLogs(data.map((row: any) => row.data));
