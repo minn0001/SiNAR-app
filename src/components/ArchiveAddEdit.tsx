@@ -531,6 +531,9 @@ export default function ArchiveAddEdit({
                 <span className="text-[9px] text-[#718096] leading-none block">Format: Lemari-Rak-Box</span>
               </div>
             </div>
+
+          </div>
+        </div>
         
         {/* RIGHT COLUMN: METADATA, VERSION & UPLOAD */}
         <div className="lg:col-span-4 space-y-6">
