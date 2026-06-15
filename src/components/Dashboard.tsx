@@ -122,9 +122,9 @@ export default function Dashboard({
     const size = parseInt(String(a?.fileDokumen?.size ?? '0'), 10);
     return acc + (isNaN(size) ? 0 : size);
   }, 0);
-  const totalGB = 0.5;
-  const usedGB = (usedSizeBytes / (1024 * 1024 * 1024)).toFixed(1);
-  const storagePercentage = Math.min(100, (parseFloat(usedGB) / totalGB) * 100);
+  const usedMB = (usedSizeBytes / (1024 * 1024)).toFixed(1);
+  const totalMB = 500;
+  const storagePercentage = Math.min(100, (parseFloat(usedMB) / totalMB) * 100);
 
   if (archives.length === 0) {
     return <div>Loading... ({archives.length} arsip)</div>;
@@ -271,7 +271,7 @@ export default function Dashboard({
             </div>
           </div>
           <span className="text-xs font-bold font-mono text-gold-royal bg-[#F5E6C8] px-2.5 py-1 rounded border border-gold-royal/30">
-            {usedGB} GB digunakan dari {totalGB} GB ({storagePercentage.toFixed(1)}%)
+            {usedMB} MB digunakan dari {totalMB} MB ({storagePercentage.toFixed(1)}%)
           </span>
         </div>
         <div className="w-full bg-[#E8DCC8]/40 h-3 rounded-full overflow-hidden p-[2px]">
