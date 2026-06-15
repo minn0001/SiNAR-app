@@ -58,6 +58,7 @@ export default function ArchiveAddEdit({
   const [namaKlien, setNamaKlien] = useState("");
   const [unitPengolah, setUnitPengolah] = useState("Divisi PPAT");
   const [keterangan, setKeterangan] = useState("");
+  const [lokasiFisik, setLokasiFisik] = useState("");
   
   // Tag fields
   const [tags, setTags] = useState<string[]>([]);
@@ -89,6 +90,7 @@ export default function ArchiveAddEdit({
       setNamaKlien(existingArchive.namaKlien);
       setUnitPengolah(existingArchive.unitPengolah);
       setKeterangan(existingArchive.keterangan);
+      setLokasiFisik(existingArchive.lokasiFisik || "");
       setTags(existingArchive.tags);
       setUploadedFile({
         filename: existingArchive.fileDokumen.filename,
@@ -108,6 +110,7 @@ export default function ArchiveAddEdit({
       setNamaKlien("");
       setUnitPengolah("Divisi PPAT");
       setKeterangan("");
+      setLokasiFisik("");
       setTags([]);
       setUploadedFile(null);
     }
@@ -325,6 +328,7 @@ export default function ArchiveAddEdit({
       namaKlien: namaKlien.trim() || "Nihil / Umum",
       unitPengolah,
       keterangan: keterangan.trim() || "Tanpa rincian tambahan.",
+      lokasiFisik: lokasiFisik.trim() || "Belum ditentukan",
       fileDokumen: {
         url: uploadedFile!.url,
         filename: uploadedFile!.filename,
@@ -513,7 +517,21 @@ export default function ArchiveAddEdit({
             </div>
           </div>
         </div>
-
+            {/* Lokasi Fisik */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
+                Lokasi Penyimpanan Fisik
+              </label>
+              <input
+                type="text"
+                placeholder="cth: L1-R3-B12"
+                value={lokasiFisik}
+                onChange={(e) => setLokasiFisik(e.target.value)}
+                className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] font-mono placeholder-[#A0AEC0]"
+              />
+              <span className="text-[9px] text-[#718096] leading-none">Format: Lemari-Rak-Box (cth: L1-R3-B12)</span>
+            </div>
+        
         {/* RIGHT COLUMN: METADATA, VERSION & UPLOAD */}
         <div className="lg:col-span-4 space-y-6">
           
