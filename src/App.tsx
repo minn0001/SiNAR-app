@@ -48,6 +48,13 @@ export default function App() {
   setTimeout(() => setToast(null), 3000);
 };
 
+  // Baca archive ID dari URL saat pertama kali load
+  const getArchiveIdFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('archive');
+  };
+  const [pendingArchiveFromUrl] = useState(getArchiveIdFromUrl);
+
   useEffect(() => {
   const loadArchives = async () => {
     const { data, error } = await supabase
@@ -238,14 +245,6 @@ export default function App() {
     if (!query || recentSearches.includes(query)) return;
     setRecentSearches((prev) => [query, ...prev.slice(0, 4)]);
   };
-
-  // Baca archive ID dari URL saat pertama kali load
-  const getArchiveIdFromUrl = () => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('archive');
-  };
-  
-  const [pendingArchiveFromUrl] = useState(getArchiveIdFromUrl);
 
   // Calculate the sidebar notification badge count (Archives nearing retention/overdue within 180 days)
   const calculateRetentionAlertCount = (): number => {
