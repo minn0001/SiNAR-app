@@ -585,8 +585,14 @@ export default function ArchiveDetail({
             </div>
 
             {/* QRCode Canvas Render */}
-            <div className="bg-[#FAFAF8] p-4 rounded-lg inline-block shadow-inner border border-[#E8DCC8] animate-pulse">
-            value={window.location.origin + "/?archive=" + archive.id}
+            <div className="bg-[#FAFAF8] p-4 rounded-lg inline-block shadow-inner border border-[#E8DCC8]">
+              <QRCodeSVG 
+                value={window.location.origin + "/?archive=" + archive.id}
+                size={140}
+                bgColor="#FAFAF8"
+                fgColor="#0B1F3A"
+                includeMargin={false}
+              />
             </div>
 
             <p className="text-[11px] text-[#718096] leading-relaxed text-justify px-2 leading-tight">
