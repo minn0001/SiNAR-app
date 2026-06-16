@@ -659,7 +659,7 @@ export default function ArchiveDetail({
               <div className="flex gap-3">
                 <div className="bg-slate-100 p-1 rounded inline-block border border-slate-300">
                   <QRCodeSVG 
-                    value={archive.nomorArsip} 
+                    value={window.location.origin + "/?archive=" + archive.id}
                     size={80}
                     bgColor="#FFFFFF"
                     fgColor="#000000"
