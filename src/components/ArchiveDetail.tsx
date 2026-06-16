@@ -586,7 +586,7 @@ export default function ArchiveDetail({
 
             {/* QRCode Canvas Render */}
             <div className="bg-[#FAFAF8] p-4 rounded-lg inline-block shadow-inner border border-[#E8DCC8] animate-pulse">
-            value={`${window.location.origin}/?archive=${archive.id}`}
+            value={window.location.origin + "/?archive=" + archive.id}
             </div>
 
             <p className="text-[11px] text-[#718096] leading-relaxed text-justify px-2 leading-tight">
