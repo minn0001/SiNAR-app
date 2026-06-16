@@ -73,13 +73,24 @@ useEffect(() => {
       .order('created_at', { ascending: false });
 
     useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const archiveId = params.get('archive');
-  if (archiveId && currentUser) {
-    setActiveArchiveId(archiveId);
-    setCurrentPage("DETAIL_ARSIP");
-  }
-}, [currentUser, allArchives]);
+      const params = new URLSearchParams(window.location.search);
+      const archiveId = params.get('archive');
+      if (archiveId) {
+        // Simpan archive ID ke sessionStorage supaya tidak hilang setelah login
+        sessionStorage.setItem('pendingArchiveId', archiveId);
+      }
+    }, []);
+    
+    useEffect(() => {
+      if (currentUser && allArchives.length > 0) {
+        const pendingId = sessionStorage.getItem('pendingArchiveId');
+        if (pendingId) {
+          sessionStorage.removeItem('pendingArchiveId');
+          setActiveArchiveId(pendingId);
+          setCurrentPage("DETAIL_ARSIP");
+        }
+      }
+    }, [currentUser, allArchives]);
     
     if (!error && data && data.length > 0) {
       setAllAuditLogs(data.map((row: any) => row.data));
