@@ -65,39 +65,29 @@ export default function App() {
   loadArchives();
 }, []);
 
-useEffect(() => {
-  const loadAuditLogs = async () => {
-    const { data, error } = await supabase
-      .from('audit_log')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      const archiveId = params.get('archive');
-      if (archiveId) {
-        // Simpan archive ID ke sessionStorage supaya tidak hilang setelah login
-        sessionStorage.setItem('pendingArchiveId', archiveId);
+  useEffect(() => {
+    const loadAuditLogs = async () => {
+      const { data, error } = await supabase
+        .from('audit_log')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (!error && data && data.length > 0) {
+        setAllAuditLogs(data.map((row: any) => row.data));
       }
-    }, []);
-    
-    useEffect(() => {
-      if (currentUser && allArchives.length > 0) {
-        const pendingId = sessionStorage.getItem('pendingArchiveId');
-        if (pendingId) {
-          sessionStorage.removeItem('pendingArchiveId');
-          setActiveArchiveId(pendingId);
-          setCurrentPage("DETAIL_ARSIP");
-        }
+    };
+    loadAuditLogs();
+  }, []);
+  
+  useEffect(() => {
+    if (pendingArchiveFromUrl && currentUser && allArchives.length > 0) {
+      const exists = allArchives.find(a => a.id === pendingArchiveFromUrl);
+      if (exists) {
+        setActiveArchiveId(pendingArchiveFromUrl);
+        setCurrentPage("DETAIL_ARSIP");
       }
-    }, [currentUser, allArchives]);
-    
-    if (!error && data && data.length > 0) {
-      setAllAuditLogs(data.map((row: any) => row.data));
     }
-  };
-  loadAuditLogs();
-}, []);
+  }, [currentUser, allArchives, pendingArchiveFromUrl]);
   
   // --- SESSION TIMER STATE ---
   const [secondsRemaining, setSecondsRemaining] = useState<number>(SESSION_LIMIT);
@@ -248,6 +238,14 @@ useEffect(() => {
     if (!query || recentSearches.includes(query)) return;
     setRecentSearches((prev) => [query, ...prev.slice(0, 4)]);
   };
+
+  // Baca archive ID dari URL saat pertama kali load
+  const getArchiveIdFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('archive');
+  };
+  
+  const [pendingArchiveFromUrl] = useState(getArchiveIdFromUrl);
 
   // Calculate the sidebar notification badge count (Archives nearing retention/overdue within 180 days)
   const calculateRetentionAlertCount = (): number => {
