@@ -135,6 +135,21 @@ export default function App() {
   // --- MUTATION EVENTS & ACTIONS ---
 
   const handleLoginSuccess = async (user: User) => {
+    const now = new Date().toLocaleString("id-ID", {
+    timeZone: "Asia/Jakarta",
+    hour12: false,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  const userWithLoginTime: User = {
+    ...user,
+    lastLogin: now + " WIB"
+  };
+    
     setCurrentUser(user);
     setCurrentPage("DASHBOARD");
     setSecondsRemaining(SESSION_LIMIT);
