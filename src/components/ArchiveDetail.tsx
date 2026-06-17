@@ -127,115 +127,98 @@ export default function ArchiveDetail({
           <title>Label QR - ${archive.nomorArsip}</title>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-            @page {
-              size: 9cm 5cm;
-              margin: 0;
-            }
-  
             body { 
               font-family: sans-serif; 
-              width: 9cm;
-              height: 5cm;
-              overflow: hidden;
+              padding: 16px;
+              width: 320px;
             }
-  
             .card {
-              width: 9cm;
-              height: 5cm;
               border: 2px solid #111;
-              padding: 8px 10px;
+              padding: 12px;
+              border-radius: 6px;
               background: white;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
             }
             .header {
               display: flex;
               justify-content: space-between;
               align-items: center;
               border-bottom: 1px solid #aaa;
-              padding-bottom: 4px;
-              margin-bottom: 5px;
+              padding-bottom: 6px;
+              margin-bottom: 8px;
             }
             .header-left {
-              font-size: 8px;
+              font-size: 9px;
               font-weight: bold;
               text-transform: uppercase;
               letter-spacing: 0.05em;
             }
             .header-code {
-              font-size: 7px;
+              font-size: 8px;
               font-family: monospace;
               background: #e2e2e2;
-              padding: 1px 4px;
+              padding: 2px 4px;
               border-radius: 3px;
             }
             .body {
               display: flex;
-              gap: 8px;
-              flex: 1;
+              gap: 10px;
             }
             .qr-box {
               background: #f5f5f5;
               border: 1px solid #ccc;
-              padding: 3px;
-              border-radius: 3px;
+              padding: 4px;
+              border-radius: 4px;
               flex-shrink: 0;
-              display: flex;
-              align-items: center;
-            }
-            .qr-box svg {
-              width: 68px !important;
-              height: 68px !important;
             }
             .info {
               flex: 1;
               display: flex;
               flex-direction: column;
-              justify-content: space-between;
-              gap: 2px;
-              padding-top: 2px;
+              gap: 4px;
             }
             .label {
-              font-size: 6.5px;
+              font-size: 7.5px;
               text-transform: uppercase;
               color: #555;
               font-weight: 700;
-              letter-spacing: 0.04em;
+              letter-spacing: 0.05em;
             }
             .value {
-              font-size: 9.5px;
+              font-size: 10px;
               font-weight: bold;
               font-family: monospace;
               color: #111;
               line-height: 1.2;
             }
             .value-sm {
-              font-size: 8px;
+              font-size: 8.5px;
               font-weight: bold;
               color: #111;
+              max-width: 160px;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              max-width: 150px;
             }
             .grid-2 {
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 3px;
+              gap: 4px;
+              margin-top: 4px;
             }
             .footer {
               border-top: 1px dashed #aaa;
-              padding-top: 4px;
-              margin-top: 4px;
+              padding-top: 5px;
+              margin-top: 8px;
               display: flex;
               justify-content: space-between;
-              font-size: 6.5px;
+              font-size: 7px;
               color: #666;
               text-transform: uppercase;
               font-family: monospace;
               font-weight: bold;
+            }
+            @media print {
+              body { padding: 0; }
             }
           </style>
         </head>
@@ -261,11 +244,11 @@ export default function ArchiveDetail({
                 <div class="grid-2">
                   <div>
                     <div class="label">Kategori</div>
-                    <div class="value-sm" style="font-size:7px">${archive.kategori}</div>
+                    <div class="value-sm" style="font-size:8px">${archive.kategori}</div>
                   </div>
                   <div>
                     <div class="label">Tanggal</div>
-                    <div class="value" style="font-size:7.5px">${archive.tanggalArsip}</div>
+                    <div class="value" style="font-size:8px">${archive.tanggalArsip}</div>
                   </div>
                 </div>
               </div>
