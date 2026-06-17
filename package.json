@@ -23,6 +23,9 @@
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "recharts": "^3.8.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "xlsx": "^0.18.5",
     "vite": "^6.2.3"
   },
   "devDependencies": {
