@@ -30,7 +30,6 @@ import {
   Area,
 } from "recharts";
 import { Archive, KategoriArsip, StatusArsip } from "../types";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
  
@@ -46,8 +45,6 @@ export default function Reports({ archives }: ReportsProps) {
     "3 Bulan" | "65 Bulan" | "1 Tahun" | "Custom"
   >("1 Tahun");
   const [isExporting, setIsExporting] = useState(false);
- 
-  const printAreaRef = useRef<HTMLDivElement>(null);
  
   // Sum categories
   const getCategoryCount = (cat: KategoriArsip) =>
@@ -120,10 +117,83 @@ export default function Reports({ archives }: ReportsProps) {
     Unit: unit,
     Jumlah: archives.filter((a) => a.unitPengolah === unit).length,
   }));
+
+// Helper: gambar tabel di PDF
+  const drawTable = (
+    pdf: jsPDF,
+    headers: string[],
+    rows: string[][],
+    colWidths: number[],
+    startY: number,
+    margin: number,
+    _contentW: number
+  ) => {
+    const rowH = 8;
+ 
+    // Header row
+    pdf.setFillColor(245, 230, 200); // #F5E6C8
+    pdf.rect(
+      margin,
+      startY,
+      colWidths.reduce((a, b) => a + b, 0),
+      rowH,
+      "F"
+    );
+    pdf.setTextColor(11, 31, 58);
+    pdf.setFontSize(7.5);
+    pdf.setFont("helvetica", "bold");
+ 
+    let x = margin;
+    headers.forEach((h, i) => {
+      pdf.text(h, x + 3, startY + 5.5);
+      x += colWidths[i];
+    });
+ 
+    // Data rows
+    rows.forEach((row, rIdx) => {
+      const y = startY + rowH * (rIdx + 1);
+      pdf.setFillColor(rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 248 : 255);
+      pdf.rect(
+        margin,
+        y,
+        colWidths.reduce((a, b) => a + b, 0),
+        rowH,
+        "F"
+      );
+      pdf.setDrawColor(232, 220, 200);
+      pdf.setLineWidth(0.2);
+      pdf.line(
+        margin,
+        y + rowH,
+        margin + colWidths.reduce((a, b) => a + b, 0),
+        y + rowH
+      );
+ 
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(74, 85, 104);
+      pdf.setFontSize(7.5);
+ 
+      let cx = margin;
+      row.forEach((cell, i) => {
+        pdf.text(String(cell), cx + 3, y + 5.5);
+        cx += colWidths[i];
+      });
+    });
+ 
+    // Border luar tabel
+    pdf.setDrawColor(200, 155, 60);
+    pdf.setLineWidth(0.4);
+    pdf.rect(
+      margin,
+      startY,
+      colWidths.reduce((a, b) => a + b, 0),
+      rowH * (rows.length + 1),
+      "S"
+    );
+  };
  
   // ─── CETAK PDF ─────────────────────────────────────────────────────────────
   const handleCetakPDF = async () => {
-    if (!printAreaRef.current) return;
     setIsExporting(true);
  
     try {
@@ -408,80 +478,6 @@ export default function Reports({ archives }: ReportsProps) {
     } finally {
       setIsExporting(false);
     }
-  };
- 
-  // Helper: gambar tabel di PDF
-  const drawTable = (
-    pdf: jsPDF,
-    headers: string[],
-    rows: string[][],
-    colWidths: number[],
-    startY: number,
-    margin: number,
-    _contentW: number
-  ) => {
-    const rowH = 8;
- 
-    // Header row
-    pdf.setFillColor(245, 230, 200); // #F5E6C8
-    pdf.rect(
-      margin,
-      startY,
-      colWidths.reduce((a, b) => a + b, 0),
-      rowH,
-      "F"
-    );
-    pdf.setTextColor(11, 31, 58);
-    pdf.setFontSize(7.5);
-    pdf.setFont("helvetica", "bold");
- 
-    let x = margin;
-    headers.forEach((h, i) => {
-      pdf.text(h, x + 3, startY + 5.5);
-      x += colWidths[i];
-    });
- 
-    // Data rows
-    rows.forEach((row, rIdx) => {
-      const y = startY + rowH * (rIdx + 1);
-      pdf.setFillColor(rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 248 : 255);
-      pdf.rect(
-        margin,
-        y,
-        colWidths.reduce((a, b) => a + b, 0),
-        rowH,
-        "F"
-      );
-      pdf.setDrawColor(232, 220, 200);
-      pdf.setLineWidth(0.2);
-      pdf.line(
-        margin,
-        y + rowH,
-        margin + colWidths.reduce((a, b) => a + b, 0),
-        y + rowH
-      );
- 
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(74, 85, 104);
-      pdf.setFontSize(7.5);
- 
-      let cx = margin;
-      row.forEach((cell, i) => {
-        pdf.text(String(cell), cx + 3, y + 5.5);
-        cx += colWidths[i];
-      });
-    });
- 
-    // Border luar tabel
-    pdf.setDrawColor(200, 155, 60);
-    pdf.setLineWidth(0.4);
-    pdf.rect(
-      margin,
-      startY,
-      colWidths.reduce((a, b) => a + b, 0),
-      rowH * (rows.length + 1),
-      "S"
-    );
   };
  
   // ─── EXPORT EXCEL ──────────────────────────────────────────────────────────
