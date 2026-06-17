@@ -115,7 +115,30 @@ export default function ArchiveDetail({
   };
 
   const handlePrintTrigger = () => {
-    window.print();
+    const printContent = document.getElementById("physical-printable-tag");
+    if (!printContent) return;
+    
+    const printWindow = window.open('', '_blank', 'width=400,height=300');
+    if (!printWindow) return;
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Label QR - ${archive.nomorArsip}</title>
+          <style>
+            body { margin: 0; padding: 16px; font-family: sans-serif; }
+            * { box-sizing: border-box; }
+          </style>
+        </head>
+        <body>
+          ${printContent.innerHTML}
+          <script>
+            window.onload = function() { window.print(); window.close(); }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handleConfirmDelete = (e: React.FormEvent) => {
