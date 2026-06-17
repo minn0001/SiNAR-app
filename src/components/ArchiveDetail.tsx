@@ -115,23 +115,149 @@ export default function ArchiveDetail({
   };
 
   const handlePrintTrigger = () => {
-    const printContent = document.getElementById("physical-printable-tag");
-    if (!printContent) return;
-    
-    const printWindow = window.open('', '_blank', 'width=400,height=300');
+    const qrSvgElement = document.querySelector("#physical-printable-tag svg");
+    const qrSvgString = qrSvgElement ? qrSvgElement.outerHTML : "";
+  
+    const printWindow = window.open('', '_blank', 'width=400,height=350');
     if (!printWindow) return;
-    
+  
     printWindow.document.write(`
       <html>
         <head>
           <title>Label QR - ${archive.nomorArsip}</title>
           <style>
-            body { margin: 0; padding: 16px; font-family: sans-serif; }
-            * { box-sizing: border-box; }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { 
+              font-family: sans-serif; 
+              padding: 16px;
+              width: 320px;
+            }
+            .card {
+              border: 2px solid #111;
+              padding: 12px;
+              border-radius: 6px;
+              background: white;
+            }
+            .header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 1px solid #aaa;
+              padding-bottom: 6px;
+              margin-bottom: 8px;
+            }
+            .header-left {
+              font-size: 9px;
+              font-weight: bold;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            }
+            .header-code {
+              font-size: 8px;
+              font-family: monospace;
+              background: #e2e2e2;
+              padding: 2px 4px;
+              border-radius: 3px;
+            }
+            .body {
+              display: flex;
+              gap: 10px;
+            }
+            .qr-box {
+              background: #f5f5f5;
+              border: 1px solid #ccc;
+              padding: 4px;
+              border-radius: 4px;
+              flex-shrink: 0;
+            }
+            .info {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+            }
+            .label {
+              font-size: 7.5px;
+              text-transform: uppercase;
+              color: #555;
+              font-weight: 700;
+              letter-spacing: 0.05em;
+            }
+            .value {
+              font-size: 10px;
+              font-weight: bold;
+              font-family: monospace;
+              color: #111;
+              line-height: 1.2;
+            }
+            .value-sm {
+              font-size: 8.5px;
+              font-weight: bold;
+              color: #111;
+              max-width: 160px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            .grid-2 {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 4px;
+              margin-top: 4px;
+            }
+            .footer {
+              border-top: 1px dashed #aaa;
+              padding-top: 5px;
+              margin-top: 8px;
+              display: flex;
+              justify-content: space-between;
+              font-size: 7px;
+              color: #666;
+              text-transform: uppercase;
+              font-family: monospace;
+              font-weight: bold;
+            }
+            @media print {
+              body { padding: 0; }
+            }
           </style>
         </head>
         <body>
-          ${printContent.innerHTML}
+          <div class="card">
+            <div class="header">
+              <span class="header-left">notariat utama sinar</span>
+              <span class="header-code">CODE: ${archive.id}</span>
+            </div>
+            <div class="body">
+              <div class="qr-box">
+                ${qrSvgString}
+              </div>
+              <div class="info">
+                <div>
+                  <div class="label">Nomor Arsip:</div>
+                  <div class="value">${archive.nomorArsip}</div>
+                </div>
+                <div>
+                  <div class="label">Judul Akta:</div>
+                  <div class="value-sm">${archive.judulArsip}</div>
+                </div>
+                <div class="grid-2">
+                  <div>
+                    <div class="label">Kategori</div>
+                    <div class="value-sm" style="font-size:8px">${archive.kategori}</div>
+                  </div>
+                  <div>
+                    <div class="label">Tanggal</div>
+                    <div class="value" style="font-size:8px">${archive.tanggalArsip}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="footer">
+              <span>sistem pengarsipan terstruktur</span>
+              <span>tgl retensi: ${archive.tanggalRetensi}</span>
+            </div>
+          </div>
           <script>
             window.onload = function() { window.print(); window.close(); }
           </script>
