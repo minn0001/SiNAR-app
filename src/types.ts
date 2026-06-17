@@ -82,6 +82,7 @@ export interface User {
   createdAt: string;
   username: string;
   nip_sk?: string;
+  lastLogin?: string;
 }
 
 export interface AuditLog {
