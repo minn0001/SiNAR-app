@@ -150,7 +150,7 @@ export default function App() {
     lastLogin: now + " WIB"
   };
     
-    setCurrentUser(user);
+    setCurrentUser(userWithLoginTime);
     setCurrentPage("DASHBOARD");
     setSecondsRemaining(SESSION_LIMIT);
     setShowTimeoutModal(false);
