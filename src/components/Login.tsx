@@ -17,8 +17,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [password, setPassword] = useState("password123"); // default mock password
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [forgotPasswordMsg, setForgotPasswordMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,13 +184,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             </div>
           )}
 
-          {forgotPasswordMsg && (
-            <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 text-yellow-700 text-xs rounded-lg flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping" />
-              {forgotPasswordMsg}
-            </div>
-          )}
-
           <div className="space-y-2">
             <label className="text-xs font-semibold text-[#0B1F3A] uppercase tracking-widest block">
               Alamat Email / Pengguna
@@ -216,7 +211,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               </label>
               <button
                 type="button"
-                onClick={() => setForgotPasswordMsg("Mock: Instruksi reset sandi sementara dikirim ke alamat email terkait.")}
+                onClick={() => {
+                  setForgotEmail(email); // pre-fill kalau email sudah diisi
+                  setShowForgotModal(true);
+                }}
                 className="text-xs text-gold-royal hover:text-gold-dark hover:underline transition font-medium"
               >
                 Lupa Sandi?
@@ -308,6 +306,98 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           </div>
         </div>
       </div>
+
+      {showForgotModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+    <div className="bg-white w-full max-w-sm rounded-xl border border-[#E8DCC8] shadow-2xl overflow-hidden">
+      {/* Gold top bar */}
+      <div className="h-1 w-full bg-gradient-to-r from-gold-dark via-gold-royal to-gold-dark" />
+      
+      <div className="p-6 space-y-4">
+        {!forgotSent ? (
+          <>
+            <div>
+              <h3 className="text-base font-bold text-[#0B1F3A] font-display tracking-wide">
+                Reset Kata Sandi
+              </h3>
+              <p className="text-xs text-[#718096] mt-1 leading-relaxed">
+                Masukkan alamat email akun SiNAR kamu. Kami akan mengirimkan instruksi reset sandi ke email tersebut.
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[#0B1F3A] uppercase tracking-widest block">
+                Alamat Email
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-[#C89B3C]">
+                  <Mail className="w-4 h-4" />
+                </span>
+                <input
+                  type="email"
+                  placeholder="cth: notaris@sinar-notaris.com"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  className="w-full bg-[#FAFAF8] text-[#0B1F3A] placeholder-[#A0AEC0] text-sm border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg py-2.5 pl-10 pr-4 transition"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2.5 pt-1">
+              <button
+                onClick={() => {
+                  setShowForgotModal(false);
+                  setForgotEmail("");
+                  setForgotSent(false);
+                }}
+                className="flex-1 px-3 py-2.5 bg-[#F5F0E8] hover:bg-[#EDE8E0] text-[#4A5568] font-semibold rounded-lg text-xs transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  if (forgotEmail) setForgotSent(true);
+                }}
+                className="flex-1 px-3 py-2.5 bg-gold-royal hover:bg-gold-dark text-white font-bold rounded-lg text-xs transition cursor-pointer"
+              >
+                Kirim Instruksi
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-center py-2 space-y-3">
+              <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto">
+                <Mail className="w-7 h-7 text-emerald-500" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-[#0B1F3A]">Email Terkirim!</h3>
+                <p className="text-xs text-[#718096] mt-1.5 leading-relaxed">
+                  Instruksi reset sandi telah dikirim ke<br />
+                  <strong className="text-[#0B1F3A]">{forgotEmail}</strong>
+                </p>
+                <p className="text-[10px] text-[#A0AEC0] mt-2">
+                  Periksa folder spam jika tidak muncul dalam beberapa menit.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowForgotModal(false);
+                setForgotEmail("");
+                setForgotSent(false);
+              }}
+              className="w-full px-3 py-2.5 bg-gold-royal hover:bg-gold-dark text-white font-bold rounded-lg text-xs transition cursor-pointer"
+            >
+              Kembali ke Login
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
