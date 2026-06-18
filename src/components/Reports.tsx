@@ -555,48 +555,65 @@ export default function Reports({ archives }: ReportsProps) {
  
         XLSX.utils.book_append_sheet(wb, ws, "Per Periode");
       } else {
-        // Rekapitulasi — 2 sheet
-        // Sheet Status
-        const statusData = statusSummary.map((row) => {
-          let desc = "Berkas aktif, berlanjut masa retensi";
-          if (row.Status === StatusArsip.INAKTIF)
-            desc = "Retensi usai, berkas pasif";
-          else if (row.Status === StatusArsip.PERMANEN)
-            desc = "Asal selamanya disimpan";
-          else if (row.Status === StatusArsip.MENUNGGU_PEMUSNAHAN)
-            desc = "Berkas kedaluwarsa siap dilebur";
-          return {
-            "Status Prosedur": row.Status,
-            Definisi: desc,
-            Jumlah: row.Jumlah,
-          };
-        });
- 
-        const ws1 = XLSX.utils.aoa_to_sheet([
-          ["KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn."],
-          ["Rekapitulasi Berdasarkan Status Arsip"],
-          [`Tanggal Cetak: ${tanggal}`],
-          [],
-        ]);
-        XLSX.utils.sheet_add_json(ws1, statusData, { origin: "A5" });
-        XLSX.utils.book_append_sheet(wb, ws1, "Status Arsip");
- 
-        // Sheet Unit
-        const unitData = unitSummary.map((row) => ({
+      // Rekapitulasi — 1 sheet, 2 tabel (sama seperti PDF)
+      const statusData = statusSummary.map((row) => {
+        let desc = "Berkas aktif, berlanjut masa retensi";
+        if (row.Status === StatusArsip.INAKTIF)
+          desc = "Retensi usai, berkas pasif";
+        else if (row.Status === StatusArsip.PERMANEN)
+          desc = "Asal selamanya disimpan";
+        else if (row.Status === StatusArsip.MENUNGGU_PEMUSNAHAN)
+          desc = "Berkas kedaluwarsa siap dilebur";
+        return {
+          "Status Prosedur": row.Status,
+          Definisi: desc,
+          Jumlah: row.Jumlah,
+        };
+      });
+    
+      const unitData = unitSummary.map((row) => {
+        return {
           "Unit Pengolah": row.Unit,
           Jumlah: row.Jumlah,
-        }));
- 
-        const ws2 = XLSX.utils.aoa_to_sheet([
-          ["KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn."],
-          ["Rekapitulasi Berdasarkan Unit Pengolah"],
-          [`Tanggal Cetak: ${tanggal}`],
-          [],
-        ]);
-        XLSX.utils.sheet_add_json(ws2, unitData, { origin: "A5" });
-        XLSX.utils.book_append_sheet(wb, ws2, "Unit Pengolah");
-      }
- 
+        };
+      });
+    
+      // Buat 1 sheet gabungan
+      const ws = XLSX.utils.aoa_to_sheet([
+        ["KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn."],
+        ["Laporan Rekapitulasi Arsip"],
+        [`Tanggal Cetak: ${tanggal}`],
+        [],
+        ["A. Rekapitulasi Berdasarkan Status Arsip"],
+      ]);
+    
+      // Tabel 1: Status (mulai baris 6)
+      XLSX.utils.sheet_add_json(ws, statusData, { origin: "A6" });
+    
+      // Baris kosong pemisah + judul tabel 2
+      const tabel2StartRow = 6 + statusData.length + 2;
+      XLSX.utils.sheet_add_aoa(
+        ws,
+        [["B. Rekapitulasi Berdasarkan Unit Pengolah"]],
+        { origin: `A${tabel2StartRow}` }
+      );
+    
+      // Tabel 2: Unit Pengolah
+      XLSX.utils.sheet_add_json(ws, unitData, {
+        origin: `A${tabel2StartRow + 1}`,
+      });
+    
+      // Total di bawah
+      const totalRow = tabel2StartRow + 1 + unitData.length + 1;
+      XLSX.utils.sheet_add_aoa(
+        ws,
+        [[`TOTAL KESELURUHAN ARSIP: ${archives.length} berkas`]],
+        { origin: `A${totalRow}` }
+      );
+    
+      XLSX.utils.book_append_sheet(wb, ws, "Rekapitulasi");
+    }
+       
       const fileName = `Laporan_${activeTab.replace(" ", "_")}_${new Date()
         .toISOString()
         .slice(0, 10)}.xlsx`;
