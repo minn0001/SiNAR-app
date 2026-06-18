@@ -26,19 +26,19 @@ export const mockUsers: User[] = [
   },
   {
     id: "usr-02",
-    nama: "Hj. Ratna Sari, S.H.",
-    email: "ratna.sari@sinar-notaris.com",
+    nama: "Rina Maharani, S.H., M.Kn.",
+    email: "rinamaharani@sinar-notaris.com",
     role: UserRole.KEPALA_KANTOR,
     status: UserStatus.AKTIF,
     lastLogin: "2026-06-07 15:45",
     createdAt: "2024-01-15 10:15",
-    username: "ratna",
+    username: "rina",
     nip_sk: "NIP-19750918-102"
   },
   {
     id: "usr-03",
     nama: "Prasetyo Utomo, S.H., M.Kn.",
-    email: "prasetyo.u@sinar-notaris.com",
+    email: "prasetyoutomo@sinar-notaris.com",
     role: UserRole.NOTARIS,
     status: UserStatus.AKTIF,
     lastLogin: "2026-06-08 08:15",
@@ -49,7 +49,7 @@ export const mockUsers: User[] = [
   {
     id: "usr-04",
     nama: "Dewi Lestari",
-    email: "dewi.lestari@sinar-notaris.com",
+    email: "dewilestari@sinar-notaris.com",
     role: UserRole.STAFF,
     status: UserStatus.AKTIF,
     lastLogin: "2026-06-08 07:45",
@@ -60,7 +60,7 @@ export const mockUsers: User[] = [
   {
     id: "usr-05",
     nama: "Rian Hidayat",
-    email: "rian.hidayat@sinar-notaris.com",
+    email: "rianhidayat@sinar-notaris.com",
     role: UserRole.STAFF,
     status: UserStatus.NONAKTIF,
     lastLogin: "2026-05-20 16:00",
