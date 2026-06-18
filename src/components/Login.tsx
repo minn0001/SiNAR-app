@@ -275,34 +275,26 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             </h4>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => selectPreset(UserRole.ADMIN)}
-              className="px-3 py-2 text-left bg-[#F5F0E8] hover:bg-[#F5E6C8] border border-[#E8DCC8] hover:border-gold-royal text-xs rounded transition cursor-pointer flex flex-col"
-            >
-              <span className="font-semibold text-[#0B1F3A]">1. Admin</span>
-              <span className="text-[10px] text-[#718096] truncate">hendrawan@sinar...</span>
-            </button>
-            <button
-              onClick={() => selectPreset(UserRole.NOTARIS)}
-              className="px-3 py-2 text-left bg-[#F5F0E8] hover:bg-[#F5E6C8] border border-[#E8DCC8] hover:border-gold-royal text-xs rounded transition cursor-pointer flex flex-col"
-            >
-              <span className="font-semibold text-[#0B1F3A]">2. Notaris</span>
-              <span className="text-[10px] text-[#718096] truncate">prasetyo.u@sinar...</span>
-            </button>
-            <button
-              onClick={() => selectPreset(UserRole.KEPALA_KANTOR)}
-              className="px-3 py-2 text-left bg-[#F5F0E8] hover:bg-[#F5E6C8] border border-[#E8DCC8] hover:border-gold-royal text-xs rounded transition cursor-pointer flex flex-col"
-            >
-              <span className="font-semibold text-[#0B1F3A]">3. Kepala Kantor</span>
-              <span className="text-[10px] text-[#718096] truncate">ratna.sari@sinar...</span>
-            </button>
-            <button
-              onClick={() => selectPreset(UserRole.STAFF)}
-              className="px-3 py-2 text-left bg-[#F5F0E8] hover:bg-[#F5E6C8] border border-[#E8DCC8] hover:border-gold-royal text-xs rounded transition cursor-pointer flex flex-col"
-            >
-              <span className="font-semibold text-[#0B1F3A]">4. Staff / Pengolah</span>
-              <span className="text-[10px] text-[#718096] truncate">dewi.lestari@sinar...</span>
-            </button>
+            {[
+              { role: UserRole.ADMIN, label: "1. Admin" },
+              { role: UserRole.NOTARIS, label: "2. Notaris" },
+              { role: UserRole.KEPALA_KANTOR, label: "3. Kepala Kantor" },
+              { role: UserRole.STAFF, label: "4. Staff / Pengolah" },
+            ].map(({ role, label }) => {
+              const u = mockUsers.find((x) => x.role === role);
+              return (
+                <button
+                  key={role}
+                  onClick={() => selectPreset(role)}
+                  className="px-3 py-2 text-left bg-[#F5F0E8] hover:bg-[#F5E6C8] border border-[#E8DCC8] hover:border-gold-royal text-xs rounded transition cursor-pointer flex flex-col"
+                >
+                  <span className="font-semibold text-[#0B1F3A]">{label}</span>
+                  <span className="text-[10px] text-[#718096] truncate">
+                    {u ? u.email.replace("@sinar-notaris.com", "@sinar...") : "-"}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
