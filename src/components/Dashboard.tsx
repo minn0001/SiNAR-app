@@ -77,40 +77,68 @@ export default function Dashboard({
 
   // Bar Chart Data based on Filter
   const getTrendData = () => {
-    switch (trendPeriod) {
-      case "Minggu Ini":
-        return [
-          { name: "Sen", Volume: 2 },
-          { name: "Sel", Volume: 4 },
-          { name: "Rab", Volume: 1 },
-          { name: "Kam", Volume: 5 },
-          { name: "Jum", Volume: 3 },
-          { name: "Sab", Volume: 1 },
-          { name: "Min", Volume: 0 }
-        ];
-      case "Bulan Ini":
-        return [
-          { name: "Minggu 1", Volume: 12 },
-          { name: "Minggu 2", Volume: 18 },
-          { name: "Minggu 3", Volume: 15 },
-          { name: "Minggu 4", Volume: 22 }
-        ];
-      case "3 Bulan":
-        return [
-          { name: "Maret", Volume: 38 },
-          { name: "April", Volume: 45 },
-          { name: "Mei", Volume: 52 }
-        ];
-      case "Custom":
-        return [
-          { name: "Q1-2025", Volume: 84 },
-          { name: "Q2-2025", Volume: 98 },
-          { name: "Q3-2025", Volume: 110 },
-          { name: "Q4-2025", Volume: 130 },
-          { name: "Q1-2026", Volume: 145 }
-        ];
+  const today = new Date("2026-06-18");
+
+  if (trendPeriod === "Minggu Ini") {
+    const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    const result = days.map((name) => ({ name, Volume: 0 }));
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    archives.forEach((a) => {
+      const d = new Date(a.createdAt);
+      if (d >= startOfWeek && d <= today) {
+        result[d.getDay()].Volume += 1;
+      }
+    });
+    return result;
+  }
+
+  if (trendPeriod === "Bulan Ini") {
+    const result = [
+      { name: "Minggu 1", Volume: 0 },
+      { name: "Minggu 2", Volume: 0 },
+      { name: "Minggu 3", Volume: 0 },
+      { name: "Minggu 4", Volume: 0 },
+    ];
+    archives.forEach((a) => {
+      const d = new Date(a.createdAt);
+      if (d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth()) {
+        const week = Math.min(Math.floor((d.getDate() - 1) / 7), 3);
+        result[week].Volume += 1;
+      }
+    });
+    return result;
+  }
+
+  if (trendPeriod === "3 Bulan") {
+    const result: { name: string; Volume: number }[] = [];
+    for (let i = 2; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const label = d.toLocaleString("id-ID", { month: "long" });
+      const count = archives.filter((a) => {
+        const ad = new Date(a.createdAt);
+        return ad.getFullYear() === d.getFullYear() && ad.getMonth() === d.getMonth();
+      }).length;
+      result.push({ name: label, Volume: count });
     }
-  };
+    return result;
+  }
+
+  // Custom: 5 tahun terakhir per kuartal
+  const result: { name: string; Volume: number }[] = [];
+  for (let i = 4; i >= 0; i--) {
+    const year = today.getFullYear() - Math.floor(i / 4);
+    const quarter = 4 - (i % 4);
+    const label = `Q${quarter}-${year}`;
+    const startMonth = (quarter - 1) * 3;
+    const count = archives.filter((a) => {
+      const ad = new Date(a.createdAt);
+      return ad.getFullYear() === year && ad.getMonth() >= startMonth && ad.getMonth() < startMonth + 3;
+    }).length;
+    result.push({ name: label, Volume: count });
+  }
+  return result;
+};
 
   // Recent activity: order archives by simulated updatedAt timestamp or createdAt descending
   const recentActivities = [...archives]
