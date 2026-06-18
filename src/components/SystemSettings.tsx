@@ -69,6 +69,18 @@ export default function SystemSettings({ systemConfig, onUpdateConfig }: SystemS
   // --- Backup Mockup ---
   const [backupLoading, setBackupLoading] = useState(false);
   const [lastBackup, setLastBackup] = useState(systemConfig.lastBackup);
+
+  const [editingBackup, setEditingBackup] = useState(false);
+  const [draftBackupSchedule, setDraftBackupSchedule] = useState(systemConfig.backupSchedule);
+  
+  const saveBackup = () => {
+    onUpdateConfig({ ...systemConfig, backupSchedule: draftBackupSchedule });
+    setEditingBackup(false);
+  };
+  const cancelBackup = () => {
+    setDraftBackupSchedule(systemConfig.backupSchedule);
+    setEditingBackup(false);
+  };
  
   const handleBackupNow = () => {
     setBackupLoading(true);
@@ -341,16 +353,29 @@ export default function SystemSettings({ systemConfig, onUpdateConfig }: SystemS
             <h3 className="text-sm font-semibold uppercase tracking-widest font-display text-[#0B1F3A]">
               Pencadangan Data
             </h3>
-            <span className="ml-auto text-[9px] font-bold bg-amber-50 border border-amber-200 text-amber-600 px-2 py-0.5 rounded uppercase">
-              Simulasi
-            </span>
-          </div>
- 
-          <div className="flex items-start gap-3 p-3 bg-amber-50/60 border border-amber-200/60 rounded-lg text-[10px] text-amber-700 leading-relaxed">
-            <Info className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" />
-            <span>
-              Fitur ini bersifat simulasi antarmuka. Pada versi produksi, pencadangan akan terhubung ke layanan penyimpanan cloud yang dikonfigurasi secara terpisah.
-            </span>
+            {!editingBackup ? (
+              <button
+                onClick={() => { setDraftBackupSchedule(systemConfig.backupSchedule); setEditingBackup(true); }}
+                className="ml-auto flex items-center gap-1 text-[10px] font-bold bg-[#FAFAF8] border border-[#E8DCC8] hover:border-[#C89B3C] hover:text-[#C89B3C] text-[#718096] px-2 py-0.5 rounded uppercase transition cursor-pointer"
+              >
+                <Pencil className="w-3 h-3" /> Edit
+              </button>
+            ) : (
+              <div className="ml-auto flex gap-1.5">
+                <button
+                  onClick={saveBackup}
+                  className="flex items-center gap-1 text-[10px] font-bold bg-emerald-50 border border-emerald-300 text-emerald-700 hover:bg-emerald-100 px-2 py-0.5 rounded uppercase transition cursor-pointer"
+                >
+                  <Check className="w-3 h-3" /> Simpan
+                </button>
+                <button
+                  onClick={cancelBackup}
+                  className="flex items-center gap-1 text-[10px] font-bold bg-red-50 border border-red-200 text-red-500 hover:bg-red-100 px-2 py-0.5 rounded uppercase transition cursor-pointer"
+                >
+                  <X className="w-3 h-3" /> Batal
+                </button>
+              </div>
+            )}
           </div>
  
           <div className="space-y-3 text-xs">
@@ -360,7 +385,20 @@ export default function SystemSettings({ systemConfig, onUpdateConfig }: SystemS
             </div>
             <div className="flex items-center justify-between py-2 border-b border-[#E8DCC8]/60">
               <span className="text-[#4A5568]">Frekuensi otomatis</span>
-              <span className="font-mono text-[11px] font-semibold text-[#0B1F3A]">{systemConfig.backupSchedule}</span>
+              {editingBackup ? (
+                <select
+                  value={draftBackupSchedule}
+                  onChange={(e) => setDraftBackupSchedule(e.target.value)}
+                  className="border border-[#C89B3C] focus:border-[#A67C2D] focus:outline-none rounded px-2 py-1 text-xs font-mono text-[#0B1F3A] bg-white focus:ring-1 focus:ring-[#C89B3C] transition cursor-pointer"
+                >
+                  <option value="Harian">Harian</option>
+                  <option value="Mingguan">Mingguan</option>
+                  <option value="Bulanan">Bulanan</option>
+                  <option value="Tahunan">Tahunan</option>
+                </select>
+              ) : (
+                <span className="font-mono text-[11px] font-semibold text-[#0B1F3A]">{systemConfig.backupSchedule}</span>
+              )}
             </div>
             <div className="flex items-center justify-between py-2">
               <span className="text-[#4A5568]">Status sistem</span>
