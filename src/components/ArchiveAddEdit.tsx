@@ -32,6 +32,7 @@ interface ArchiveAddEditProps {
   onNavigate: (page: string, activeId?: string | null) => void;
   onSave: (archive: Archive) => void;
   activeArchiveId?: string | null;
+  systemConfig: SystemConfig;
 }
 
 export default function ArchiveAddEdit({
@@ -40,7 +41,8 @@ export default function ArchiveAddEdit({
   currentUser,
   onNavigate,
   onSave,
-  activeArchiveId
+  activeArchiveId,
+  systemConfig
 }: ArchiveAddEditProps) {
   
   // Find current archive if editing
@@ -106,7 +108,7 @@ export default function ArchiveAddEdit({
       setTanggalArsip(new Date().toISOString().split("T")[0]);
       setKategori(KategoriArsip.AKTA_JUAL_BELI);
       setStatusArsip(StatusArsip.AKTIF);
-      setMasaRetensi(10); // Standard starting AJB
+      setMasaRetensi(systemConfig.defaultRetensi[KategoriArsip.AKTA_JUAL_BELI] as number);
       setNamaKlien("");
       setUnitPengolah("Divisi PPAT");
       setKeterangan("");
@@ -119,22 +121,12 @@ export default function ArchiveAddEdit({
 
   // Map Category to standard retention periods (Autofill trigger)
   const updateDefaultRetention = (selectedCat: KategoriArsip) => {
-    switch (selectedCat) {
-      case KategoriArsip.AKTA_JUAL_BELI:
-      case KategoriArsip.AKTA_PENDIRIAN_PERUSAHAAN:
-        setMasaRetensi(30);
-        break;
-      case KategoriArsip.SURAT_KUASA:
-      case KategoriArsip.PERJANJIAN:
-        setMasaRetensi(10);
-        break;
-      case KategoriArsip.SERTIFIKAT:
-        setMasaRetensi(99); // Permanen
-        setStatusArsip(StatusArsip.PERMANEN);
-        break;
-      case KategoriArsip.DOKUMEN_PENDUKUNG:
-        setMasaRetensi(5);
-        break;
+    const val = systemConfig.defaultRetensi[selectedCat];
+    if (val === 99 || val === "Permanen") {
+      setMasaRetensi(99);
+      setStatusArsip(StatusArsip.PERMANEN);
+    } else {
+      setMasaRetensi(val as number);
     }
   };
 
@@ -643,7 +635,9 @@ export default function ArchiveAddEdit({
                   onChange={(e) => setMasaRetensi(parseInt(e.target.value) || 1)}
                   className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A]"
                 />
-                <span className="text-[9px] text-[#718096] font-mono leading-none block">Akta AJB: 30 th | Surat Kuasa: 10 th | Perjanjian: 10 th</span>
+                <span className="text-[9px] text-[#718096] font-mono leading-none block">
+                  Akta AJB: {systemConfig.defaultRetensi[KategoriArsip.AKTA_JUAL_BELI]} th | Surat Kuasa: {systemConfig.defaultRetensi[KategoriArsip.SURAT_KUASA]} th | Perjanjian: {systemConfig.defaultRetensi[KategoriArsip.PERJANJIAN]} th
+                </span>
               </div>
 
               <div className="p-3.5 bg-[#FAFAF8] border border-[#E8DCC8] rounded-lg text-[11px] text-[#718096] leading-relaxed font-sans">
