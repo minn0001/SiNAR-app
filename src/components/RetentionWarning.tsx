@@ -121,7 +121,32 @@ export default function RetentionWarning({
       alert("Pilih setidaknya satu arsip lewat checkbox di sebelah kiri.");
       return;
     }
-    alert(`Mengekspor daftar pemusnahan ${selectedForDestruction.length} arsip ke manifest-pemusnahan.xlsx.`);
+  
+    const tanggal = today.toLocaleDateString("id-ID");
+    const data = selectedDocsForReport.map((a, idx) => ({
+      "No.": idx + 1,
+      "Nomor Arsip": a.nomorArsip,
+      "Judul Arsip": a.judulArsip,
+      "Nama Klien": a.namaKlien,
+      "Kategori": a.kategori,
+      "Tanggal Registrasi": a.tanggalArsip,
+      "Retensi Kadaluwarsa": a.tanggalRetensi,
+      "Status": a.statusArsip,
+      "Unit Pengolah": a.unitPengolah,
+    }));
+  
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn."],
+      ["Manifest Daftar Arsip untuk Pemusnahan"],
+      [`Tanggal Cetak: ${tanggal}`],
+      [`Total Berkas: ${data.length} arsip`],
+      [],
+    ]);
+    XLSX.utils.sheet_add_json(ws, data, { origin: "A6" });
+    XLSX.utils.book_append_sheet(wb, ws, "Daftar Pemusnahan");
+  
+    XLSX.writeFile(wb, `Manifest_Pemusnahan_${today.toISOString().slice(0, 10)}.xlsx`);
     setSelectedForDestruction([]);
   };
 
