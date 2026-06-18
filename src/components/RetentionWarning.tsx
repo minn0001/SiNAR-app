@@ -368,7 +368,7 @@ export default function RetentionWarning({
                 <div className="space-y-12">
                   <span>Saksi Inspeksi Kantor</span>
                   <div className="h-6" />
-                  <span className="font-semibold font-serif text-slate-800 underline block">Rina Maharani, S.H., M.Kn.</span>
+                  <span className="font-semibold font-serif text-slate-800 underline block">Prasetyo Utomo, S.H., M.Kn.</span>
                 </div>
                 <div className="space-y-12">
                   <span>Notaris Protokol Utama</span>
