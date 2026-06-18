@@ -35,8 +35,9 @@ export default function RetentionWarning({
   const [showPrintBerita, setShowPrintBerita] = useState(false);
   const [selectedForDestruction, setSelectedForDestruction] = useState<string[]>([]);
 
-  // Base date of June 8, 2026
-  const todayMs = new Date("2026-06-08").getTime();
+  // Base date 
+  const today = new Date();
+  const todayMs = today.getTime();
 
   // Helper to calculate days remaining
   const calculateDaysLeft = (expiryDateStr: string): number => {
@@ -250,9 +251,9 @@ export default function RetentionWarning({
                       </button>
 
                       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[#718096]">
-                        <span>Pihak Klien: <strong className="text-[#0B1F3A] font-semibold">{item.namaKlien}</strong></span>
+                        <span>Pihak Klien: <strong className="text-[#0B1F3A] ">{item.namaKlien}</strong></span>
                         <span>•</span>
-                        <span>Masa Pengesahan: <strong className="text-[#0B1F3A] font-mono text-[11px] font-semibold">{item.tanggalArsip}</strong></span>
+                        <span>Masa Pengesahan: <strong className="text-[#0B1F3A] font-mono text-[11px] ">{item.tanggalArsip}</strong></span>
                       </div>
                     </div>
 
@@ -295,7 +296,7 @@ export default function RetentionWarning({
             <span className="w-12 h-12 rounded-full border border-[#E8DCC8] flex items-center justify-center text-slate-600 mx-auto mb-4 bg-[#FAFAF8]">
               <CheckCircle className="w-5 h-5 text-emerald-500" />
             </span>
-            <p className="font-semibold text-[#0B1F3A] text-sm">Semua Berkas Sehat WalAfiat</p>
+            <p className=" text-[#0B1F3A] text-sm">Semua Berkas Sehat WalAfiat</p>
             <p className="text-xs text-[#718096] mt-1">Tidak ada dokumen keprotokolan notarisan yang terdeteksi mendekati kadaluwarsa retensi hukum (180 hari).</p>
           </div>
         )}
@@ -318,18 +319,20 @@ export default function RetentionWarning({
             <div id="berita-acara-printable" className="font-serif p-5 border-2 border-slate-800 bg-white text-slate-900 rounded space-y-5">
               
               <div className="text-center font-serif border-b-2 border-slate-900 pb-4">
-                <h3 className="font-serif font-extrabold text-lg uppercase tracking-wider">notariat utama jakarta pusat</h3>
-                <h4 className="font-serif text-[11px] uppercase tracking-widest mt-0.5">SINO LABS LEGAL PROTOCOL DESTRUCTION DEPUTY</h4>
+                <h3 className="font-serif font-extrabold text-lg uppercase tracking-wider">Kantor Notaris & PPAT Rina Maharani, S.H., M.Kn.</h3>
+                <h4 className="font-serif text-[11px] uppercase tracking-widest mt-0.5">Jl. Sudirman No. 45, Jakarta Selatan | Telp. (021) 5551234</h4>
                 <div className="w-32 h-[1px] bg-slate-900 mt-2 mx-auto" />
               </div>
 
               <div className="text-center font-serif space-y-1">
                 <h2 className="font-serif font-bold text-base uppercase leading-none tracking-wide">berita acara pemusnahan arsip</h2>
-                <span className="font-serif text-[11px] font-mono tracking-widest">NOMOR: BA.03/LAN-NOT/VI/2026</span>
+                <span className="font-serif text-[11px] font-mono tracking-widest">NOMOR: {nomorSurat}</span>
+                const bulanRomawi = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+                const nomorSurat = `BA.${String(selectedDocsForReport.length).padStart(2,"0")}/NOT-PPAT/${bulanRomawi[today.getMonth()]}/${today.getFullYear()}`;
               </div>
 
               <p className="font-serif text-xs leading-relaxed text-justify indent-8">
-                Pada hari ini, <strong className="font-serif">Senin, tanggal Delapan, bulan Juni, tahun Dua Ribu Dua Puluh Enam (08-06-2026)</strong>, bertempat di Kantor Notariat Utama SiNAR, kami yang menandatangani Berita Acara di bawah ini, telah melangsungkan pemusnahan <strong className="font-serif">{selectedDocsForReport.length} berkas arsip</strong> digital beserta salinan fisik fotokopi protokol, yang didasarkan atas ketentuan jatuh tempo retensi hukum kearsipan notarisan.
+                Pada hari ini, <strong className="font-serif">{today.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</strong>, bertempat di Kantor Notariat Utama SiNAR, kami yang menandatangani Berita Acara di bawah ini, telah melangsungkan pemusnahan <strong className="font-serif">{selectedDocsForReport.length} berkas arsip</strong> digital beserta salinan fisik fotokopi protokol, yang didasarkan atas ketentuan jatuh tempo retensi hukum kearsipan notarisan.
               </p>
 
               {/* Grid table inside of Berita Acara print */}
@@ -347,7 +350,7 @@ export default function RetentionWarning({
                     {selectedDocsForReport.map((row, idx) => (
                       <tr key={idx} className="border-b border-slate-300 font-serif">
                         <td className="p-1.5 border-r border-slate-400 font-mono text-[9px] font-bold">{row.nomorArsip}</td>
-                        <td className="p-1.5 border-r border-slate-400 font-semibold">{row.judulArsip}</td>
+                        <td className="p-1.5 border-r border-slate-400 ">{row.judulArsip}</td>
                         <td className="p-1.5 border-r border-slate-400 font-mono text-center">{row.tanggalArsip}</td>
                         <td className="p-1.5 text-right font-mono text-red-500 font-bold">{row.tanggalRetensi}</td>
                       </tr>
@@ -365,12 +368,12 @@ export default function RetentionWarning({
                 <div className="space-y-12">
                   <span>Saksi Inspeksi Kantor</span>
                   <div className="h-6" />
-                  <span className="font-semibold font-serif text-slate-800 underline block">Hj. Ratna Sari, S.H.</span>
+                  <span className="font-semibold font-serif text-slate-800 underline block">Rina Maharani, S.H., M.Kn.</span>
                 </div>
                 <div className="space-y-12">
                   <span>Notaris Protokol Utama</span>
                   <div className="h-6" />
-                  <span className="font-semibold font-serif text-slate-800 underline block">Hendrawan S., S.H., M.Kn.</span>
+                  <span className="font-semibold font-serif text-slate-800 underline block">Rina Maharani, S.H., M.Kn.</span>
                 </div>
               </div>
 
@@ -380,7 +383,7 @@ export default function RetentionWarning({
             <div className="flex gap-3 mt-6 justify-end select-none">
               <button
                 onClick={() => setShowPrintBerita(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-lg text-xs cursor-pointer"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600  rounded-lg text-xs cursor-pointer"
               >
                 Kembali
               </button>
