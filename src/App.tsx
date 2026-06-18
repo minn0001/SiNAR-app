@@ -315,6 +315,7 @@ export default function App() {
             currentUser={currentUser}
             onNavigate={handleNavigate}
             onSave={handleSaveArchive}
+            systemConfig={systemConfig}
           />
         );
 
@@ -327,6 +328,7 @@ export default function App() {
             onNavigate={handleNavigate}
             onSave={handleSaveArchive}
             activeArchiveId={activeArchiveId}
+            systemConfig={systemConfig}
           />
         );
 
