@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from "react";
+import jsPDF from "jspdf";
 import { 
   AlertTriangle, 
   Trash2, 
@@ -128,6 +129,104 @@ export default function RetentionWarning({
   const selectedDocsForReport = archives.filter(a => selectedForDestruction.includes(a.id));
   const bulanRomawi = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
   const nomorSurat = `BA.${String(selectedDocsForReport.length).padStart(2,"0")}/NOT-PPAT/${bulanRomawi[today.getMonth()]}/${today.getFullYear()}`;
+
+  const handleCetakBeritaAcara = () => {
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageW = 210;
+  const margin = 20;
+  const contentW = pageW - margin * 2;
+
+  // Header kantor
+  pdf.setFontSize(13);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn.", pageW / 2, 20, { align: "center" });
+  pdf.setFontSize(8);
+  pdf.setFont("helvetica", "normal");
+  pdf.text("Jl. Sudirman No. 45, Jakarta Selatan  |  Telp. (021) 5551234", pageW / 2, 26, { align: "center" });
+  pdf.setDrawColor(0, 0, 0);
+  pdf.setLineWidth(0.5);
+  pdf.line(margin, 30, pageW - margin, 30);
+
+  // Judul
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("BERITA ACARA PEMUSNAHAN ARSIP", pageW / 2, 40, { align: "center" });
+  pdf.setFontSize(8);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(`NOMOR: ${nomorSurat}`, pageW / 2, 46, { align: "center" });
+
+  // Paragraf pembuka
+  const tanggalLengkap = today.toLocaleDateString("id-ID", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric"
+  });
+  const paragraf1 = `Pada hari ini, ${tanggalLengkap}, bertempat di Kantor Notaris & PPAT Rina Maharani, S.H., M.Kn., kami yang menandatangani Berita Acara di bawah ini, telah melangsungkan pemusnahan ${selectedDocsForReport.length} berkas arsip digital beserta salinan fisik fotokopi protokol, yang didasarkan atas ketentuan jatuh tempo retensi hukum kearsipan notarisan.`;
+  const lines1 = pdf.splitTextToSize(paragraf1, contentW);
+  pdf.text(lines1, margin, 56);
+
+  // Tabel arsip
+  let tableY = 56 + lines1.length * 5 + 4;
+  const colWidths = [45, 65, 35, 35];
+  const headers = ["Nomor Arsip", "Judul Akta / Pengarah", "Tgl Registrasi", "Retensi Kadaluwarsa"];
+
+  // Header tabel
+  pdf.setFillColor(240, 240, 240);
+  pdf.rect(margin, tableY, contentW, 7, "F");
+  pdf.setFontSize(7.5);
+  pdf.setFont("helvetica", "bold");
+  let cx = margin;
+  headers.forEach((h, i) => {
+    pdf.text(h, cx + 2, tableY + 5);
+    cx += colWidths[i];
+  });
+  pdf.setDrawColor(150, 150, 150);
+  pdf.rect(margin, tableY, contentW, 7, "S");
+
+  // Baris data
+  selectedDocsForReport.forEach((row, idx) => {
+    const rowY = tableY + 7 + idx * 7;
+    pdf.setFillColor(idx % 2 === 0 ? 255 : 250, idx % 2 === 0 ? 255 : 250, idx % 2 === 0 ? 255 : 248);
+    pdf.rect(margin, rowY, contentW, 7, "F");
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(50, 50, 50);
+    let rx = margin;
+    [row.nomorArsip, row.judulArsip, row.tanggalArsip, row.tanggalRetensi].forEach((val, i) => {
+      if (i === 3) pdf.setTextColor(200, 0, 0);
+      else pdf.setTextColor(50, 50, 50);
+      pdf.text(String(val), rx + 2, rowY + 5);
+      rx += colWidths[i];
+    });
+    pdf.setDrawColor(200, 200, 200);
+    pdf.rect(margin, rowY, contentW, 7, "S");
+  });
+
+  // Paragraf penutup
+  const afterTableY = tableY + 7 + selectedDocsForReport.length * 7 + 8;
+  const paragraf2 = `Peleburan dilaksanakan menggunakan metode penghancuran mekanis terpusat guna menghapuskan sifat keterbacaan data rahasia klien selaras ketentuan Pasal 58 UU Jabatan Notaris RI secara tanggung jawab mutlak.`;
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  const lines2 = pdf.splitTextToSize(paragraf2, contentW);
+  pdf.text(lines2, margin, afterTableY);
+
+  // Tanda tangan
+  const ttdY = afterTableY + lines2.length * 5 + 20;
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.text("Saksi Inspeksi Kantor", margin + 15, ttdY, { align: "center" });
+  pdf.text("Kepala Kantor", pageW - margin - 15, ttdY, { align: "center" });
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Prasetyo Utomo, S.H., M.Kn.", margin + 15, ttdY + 25, { align: "center" });
+  pdf.text("Rina Maharani, S.H., M.Kn.", pageW - margin - 15, ttdY + 25, { align: "center" });
+
+  // Garis tanda tangan
+  pdf.setDrawColor(0, 0, 0);
+  pdf.setLineWidth(0.3);
+  pdf.line(margin, ttdY + 22, margin + 55, ttdY + 22);
+  pdf.line(pageW - margin - 55, ttdY + 22, pageW - margin, ttdY + 22);
+
+  pdf.save(`BeritaAcara_Pemusnahan_${today.toISOString().slice(0, 10)}.pdf`);
+};
 
   return (
     <div className="space-y-6">
@@ -388,10 +487,8 @@ export default function RetentionWarning({
                 Kembali
               </button>
               <button
-                onClick={() => {
-                  window.print();
-                }}
-                className="px-4.5 py-2.5 bg-red-650 hover:bg-red-600 text-white font-bold rounded-lg text-xs shadow flex items-center justify-center gap-1.5 cursor-pointer"
+                onClick={() => handleCetakBeritaAcara()}
+                className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs shadow flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Printer className="w-4 h-4" /> Cetak Berita Acara
               </button>
