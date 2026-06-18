@@ -120,77 +120,78 @@ export default function Reports({ archives }: ReportsProps) {
 
 // Helper: gambar tabel di PDF
   const drawTable = (
-    pdf: jsPDF,
-    headers: string[],
-    rows: string[][],
-    colWidths: number[],
-    startY: number,
-    margin: number,
-    _contentW: number
-  ) => {
-    const rowH = 8;
- 
-    // Header row
-    pdf.setFillColor(245, 230, 200); // #F5E6C8
-    pdf.rect(
-      margin,
-      startY,
-      colWidths.reduce((a, b) => a + b, 0),
-      rowH,
-      "F"
-    );
-    pdf.setTextColor(11, 31, 58);
-    pdf.setFontSize(7.5);
-    pdf.setFont("helvetica", "bold");
- 
-    let x = margin;
-    headers.forEach((h, i) => {
+  pdf: jsPDF,
+  headers: string[],
+  rows: string[][],
+  colWidths: number[],
+  startY: number,
+  margin: number,
+  _contentW: number,
+  centerCols: number[] = []
+) => {
+  const rowH = 8;
+
+  // Header row background
+  pdf.setFillColor(245, 230, 200);
+  pdf.rect(margin, startY, colWidths.reduce((a, b) => a + b, 0), rowH, "F");
+  pdf.setTextColor(11, 31, 58);
+  pdf.setFontSize(7.5);
+  pdf.setFont("helvetica", "bold");
+
+  let x = margin;
+  headers.forEach((h, i) => {
+    if (centerCols.includes(i)) {
+      pdf.text(h, x + colWidths[i] / 2, startY + 5.5, { align: "center" });
+    } else {
       pdf.text(h, x + 3, startY + 5.5);
-      x += colWidths[i];
-    });
- 
-    // Data rows
-    rows.forEach((row, rIdx) => {
-      const y = startY + rowH * (rIdx + 1);
-      pdf.setFillColor(rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 248 : 255);
-      pdf.rect(
-        margin,
-        y,
-        colWidths.reduce((a, b) => a + b, 0),
-        rowH,
-        "F"
-      );
-      pdf.setDrawColor(232, 220, 200);
-      pdf.setLineWidth(0.2);
-      pdf.line(
-        margin,
-        y + rowH,
-        margin + colWidths.reduce((a, b) => a + b, 0),
-        y + rowH
-      );
- 
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(74, 85, 104);
-      pdf.setFontSize(7.5);
- 
-      let cx = margin;
-      row.forEach((cell, i) => {
-        pdf.text(String(cell), cx + 3, y + 5.5);
-        cx += colWidths[i];
-      });
-    });
- 
-    // Border luar tabel
-    pdf.setDrawColor(200, 155, 60);
-    pdf.setLineWidth(0.4);
-    pdf.rect(
-      margin,
-      startY,
-      colWidths.reduce((a, b) => a + b, 0),
-      rowH * (rows.length + 1),
-      "S"
+    }
+    x += colWidths[i];
+  });
+
+  // Data rows
+  rows.forEach((row, rIdx) => {
+    const y = startY + rowH * (rIdx + 1);
+    pdf.setFillColor(
+      rIdx % 2 === 0 ? 250 : 255,
+      rIdx % 2 === 0 ? 250 : 255,
+      rIdx % 2 === 0 ? 248 : 255
     );
-  };
+    pdf.rect(margin, y, colWidths.reduce((a, b) => a + b, 0), rowH, "F");
+    pdf.setDrawColor(232, 220, 200);
+    pdf.setLineWidth(0.2);
+    pdf.line(
+      margin,
+      y + rowH,
+      margin + colWidths.reduce((a, b) => a + b, 0),
+      y + rowH
+    );
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(74, 85, 104);
+    pdf.setFontSize(7.5);
+
+    let cx = margin;
+    row.forEach((cell, i) => {
+      if (centerCols.includes(i)) {
+        pdf.text(String(cell), cx + colWidths[i] / 2, y + 5.5, { align: "center" });
+      } else {
+        pdf.text(String(cell), cx + 3, y + 5.5);
+      }
+      cx += colWidths[i];
+    });
+  });
+
+  // Border luar
+  pdf.setDrawColor(200, 155, 60);
+  pdf.setLineWidth(0.4);
+  pdf.rect(
+    margin,
+    startY,
+    colWidths.reduce((a, b) => a + b, 0),
+    rowH * (rows.length + 1),
+    "S"
+  );
+};
  
   // ─── CETAK PDF ─────────────────────────────────────────────────────────────
   const handleCetakPDF = async () => {
@@ -318,7 +319,7 @@ export default function Reports({ archives }: ReportsProps) {
           ];
         });
  
-        drawTable(pdf, headers, rows, colWidths, startY, margin, contentW);
+        drawTable(pdf, headers, rows, colWidths, startY, margin, contentW, [0, 4]);
         startY += (rows.length + 1) * 8 + 6;
  
         // Summary box
@@ -353,7 +354,7 @@ export default function Reports({ archives }: ReportsProps) {
         ]);
         const total = periodData.reduce((s, r) => s + r.Volume, 0);
  
-        drawTable(pdf, headers, rows, colWidths, startY, margin, contentW);
+        drawTable(pdf, headers, rows, colWidths, startY, margin, contentW, [0, 2, 3]);
         startY += (rows.length + 1) * 8 + 6;
  
         pdf.setFillColor(253, 248, 240);
@@ -396,7 +397,8 @@ export default function Reports({ archives }: ReportsProps) {
           statusColWidths,
           startY,
           margin,
-          contentW
+          contentW,
+          [0, 3]
         );
         startY += (statusRows.length + 1) * 8 + 12;
  
@@ -435,7 +437,8 @@ export default function Reports({ archives }: ReportsProps) {
           unitColWidths,
           startY,
           margin,
-          contentW
+          contentW,
+          [0, 3]
         );
         startY += (unitRows.length + 1) * 8 + 6;
  
@@ -461,7 +464,7 @@ export default function Reports({ archives }: ReportsProps) {
       pdf.setTextColor(150, 150, 150);
       pdf.setFont("helvetica", "normal");
       pdf.text(
-        "Dokumen ini dicetak secara otomatis oleh SiNAR – Sistem Arsip Digital. Sah tanpa tanda tangan.",
+        "Dicetak otomatis oleh SiNAR – Sistem Arsip Digital Kantor Notaris & PPAT Rina Maharani, S.H., M.Kn.",
         margin,
         footerY
       );
