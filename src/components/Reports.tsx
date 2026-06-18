@@ -58,48 +58,62 @@ export default function Reports({ archives }: ReportsProps) {
  
   // Data 2: Period counts
   const getPeriodData = () => {
-    switch (periodFilter) {
-      case "3 Bulan":
-        return [
-          { Bulan: "Maret 2026", Volume: 14 },
-          { Bulan: "April 2026", Volume: 22 },
-          { Bulan: "Mei 2026", Volume: 19 },
-          { Bulan: "Juni 2026 (berjalan)", Volume: 15 },
-        ];
-      case "65 Bulan":
-        return [
-          { Bulan: "Januari 2026", Volume: 9 },
-          { Bulan: "Februari 2026", Volume: 12 },
-          { Bulan: "Maret 2026", Volume: 14 },
-          { Bulan: "April 2026", Volume: 22 },
-          { Bulan: "Mei 2026", Volume: 19 },
-          { Bulan: "Juni 2026", Volume: 15 },
-        ];
-      case "1 Tahun":
-        return [
-          { Bulan: "Jul '25", Volume: 11 },
-          { Bulan: "Ags '25", Volume: 18 },
-          { Bulan: "Sep '25", Volume: 25 },
-          { Bulan: "Okt '25", Volume: 30 },
-          { Bulan: "Nov '25", Volume: 20 },
-          { Bulan: "Des '25", Volume: 15 },
-          { Bulan: "Jan '26", Volume: 9 },
-          { Bulan: "Feb '26", Volume: 12 },
-          { Bulan: "Mar '26", Volume: 14 },
-          { Bulan: "Apr '26", Volume: 22 },
-          { Bulan: "Mei '26", Volume: 19 },
-          { Bulan: "Jun '26", Volume: 15 },
-        ];
-      case "Custom":
-        return [
-          { Bulan: "Tahun 2022", Volume: 120 },
-          { Bulan: "Tahun 2023", Volume: 165 },
-          { Bulan: "Tahun 2024", Volume: 198 },
-          { Bulan: "Tahun 2025", Volume: 230 },
-          { Bulan: "Tahun 2026 (berjalan)", Volume: 91 },
-        ];
+  const today = new Date("2026-06-18");
+  const result: { Bulan: string; Volume: number }[] = [];
+
+  if (periodFilter === "3 Bulan") {
+    for (let i = 3; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const label = d.toLocaleString("id-ID", { month: "long", year: "numeric" })
+        + (i === 0 ? " (berjalan)" : "");
+      const count = archives.filter((a) => {
+        const ad = new Date(a.createdAt);
+        return ad.getFullYear() === d.getFullYear() && ad.getMonth() === d.getMonth();
+      }).length;
+      result.push({ Bulan: label, Volume: count });
     }
-  };
+    return result;
+  }
+
+  if (periodFilter === "65 Bulan") { // 6 bulan
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const label = d.toLocaleString("id-ID", { month: "long", year: "numeric" })
+        + (i === 0 ? " (berjalan)" : "");
+      const count = archives.filter((a) => {
+        const ad = new Date(a.createdAt);
+        return ad.getFullYear() === d.getFullYear() && ad.getMonth() === d.getMonth();
+      }).length;
+      result.push({ Bulan: label, Volume: count });
+    }
+    return result;
+  }
+
+  if (periodFilter === "1 Tahun") {
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const label = d.toLocaleString("id-ID", { month: "short" })
+        + " '" + String(d.getFullYear()).slice(2);
+      const count = archives.filter((a) => {
+        const ad = new Date(a.createdAt);
+        return ad.getFullYear() === d.getFullYear() && ad.getMonth() === d.getMonth();
+      }).length;
+      result.push({ Bulan: label, Volume: count });
+    }
+    return result;
+  }
+
+  // Custom: per tahun
+  const years = [2022, 2023, 2024, 2025, 2026];
+  years.forEach((year) => {
+    const count = archives.filter((a) => new Date(a.createdAt).getFullYear() === year).length;
+    result.push({
+      Bulan: year === 2026 ? "Tahun 2026 (berjalan)" : `Tahun ${year}`,
+      Volume: count,
+    });
+  });
+  return result;
+};
  
   // Data 3: Status counts
   const statusSummary = Object.values(StatusArsip).map((st) => ({
