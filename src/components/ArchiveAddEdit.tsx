@@ -152,21 +152,26 @@ export default function ArchiveAddEdit({
     if (mode === "add" && tanggalArsip && kategori) {
       const year = tanggalArsip.split("-")[0] || "2026";
       const romanMonth = getRomanMonth(tanggalArsip);
-      
+  
       let categoryCode = "DOK";
       if (kategori === KategoriArsip.AKTA_JUAL_BELI) categoryCode = "AKTA-AJB";
       else if (kategori === KategoriArsip.AKTA_PENDIRIAN_PERUSAHAAN) categoryCode = "AKTA-APP";
       else if (kategori === KategoriArsip.SURAT_KUASA) categoryCode = "SK";
       else if (kategori === KategoriArsip.PERJANJIAN) categoryCode = "PERJ";
       else if (kategori === KategoriArsip.SERTIFIKAT) categoryCode = "SERT-XLL";
-
-      // Sequential increment simulation
+  
       const countOfCategory = archives.filter(a => a.kategori === kategori).length + 1;
       const serial = String(countOfCategory).padStart(2, "0");
-
-      setNomorArsip(`No. ${serial}/${categoryCode}/${romanMonth}/${year}`);
+  
+      const generated = systemConfig.nomorFormat
+        .replace("{urut}", serial)
+        .replace("{KATEGORI}", categoryCode)
+        .replace("{BULAN_ROMAWI}", romanMonth)
+        .replace("{TAHUN}", year);
+  
+      setNomorArsip(generated);
     }
-  }, [tanggalArsip, kategori, mode, archives.length]);
+  }, [tanggalArsip, kategori, mode, archives.length, systemConfig.nomorFormat]);
 
   // TAG OPERATIONS
   const handleAddTag = () => {
