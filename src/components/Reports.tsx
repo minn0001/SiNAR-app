@@ -582,19 +582,10 @@ export default function Reports({ archives }: ReportsProps) {
         XLSX.utils.book_append_sheet(wb, ws1, "Status Arsip");
  
         // Sheet Unit
-        const unitData = unitSummary.map((row) => {
-          let chief = "Bp. Robertus, S.H.";
-          if (row.Unit === "Divisi PPAT") chief = "Ibu Hj. Ratna, S.H.";
-          else if (row.Unit === "Divisi Korporasi")
-            chief = "Sdr. Prasetyo, S.H., M.Kn.";
-          else if (row.Unit === "Divisi Pertanahan")
-            chief = "Sdr. Hermawan, S.H.";
-          return {
-            "Unit Pengolah": row.Unit,
-            "Supervisor Lapangan": chief,
-            Jumlah: row.Jumlah,
-          };
-        });
+        const unitData = unitSummary.map((row) => ({
+          "Unit Pengolah": row.Unit,
+          Jumlah: row.Jumlah,
+        }));
  
         const ws2 = XLSX.utils.aoa_to_sheet([
           ["KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn."],
