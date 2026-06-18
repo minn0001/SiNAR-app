@@ -383,7 +383,7 @@ export default function App() {
         );
 
       case "PENGATURAN_SISTEM":
-        return <SystemSettings systemConfig={systemConfig} />;
+        return <SystemSettings systemConfig={systemConfig} onUpdateConfig={setSystemConfig} />;
 
       default:
         return <Dashboard archives={allArchives} currentUser={currentUser} onNavigate={handleNavigate} retentionUrgentList={[]} />;
