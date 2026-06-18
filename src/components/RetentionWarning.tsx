@@ -126,6 +126,8 @@ export default function RetentionWarning({
 
   // Get active selected documents list for printing mock News Report
   const selectedDocsForReport = archives.filter(a => selectedForDestruction.includes(a.id));
+  const bulanRomawi = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+  const nomorSurat = `BA.${String(selectedDocsForReport.length).padStart(2,"0")}/NOT-PPAT/${bulanRomawi[today.getMonth()]}/${today.getFullYear()}`;
 
   return (
     <div className="space-y-6">
@@ -327,8 +329,6 @@ export default function RetentionWarning({
               <div className="text-center font-serif space-y-1">
                 <h2 className="font-serif font-bold text-base uppercase leading-none tracking-wide">berita acara pemusnahan arsip</h2>
                 <span className="font-serif text-[11px] font-mono tracking-widest">NOMOR: {nomorSurat}</span>
-                const bulanRomawi = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
-                const nomorSurat = `BA.${String(selectedDocsForReport.length).padStart(2,"0")}/NOT-PPAT/${bulanRomawi[today.getMonth()]}/${today.getFullYear()}`;
               </div>
 
               <p className="font-serif text-xs leading-relaxed text-justify indent-8">
