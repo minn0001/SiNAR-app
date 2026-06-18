@@ -108,12 +108,9 @@ export default function Reports({ archives }: ReportsProps) {
   }));
  
   // Data 4: Unit pengolah counts
-  const unitSummary = [
-    "Divisi PPAT",
-    "Divisi Korporasi",
-    "Divisi Pertanahan",
-    "Divisi Umum",
-  ].map((unit) => ({
+  const unitSummary = Array.from(
+    new Set(archives.map((a) => a.unitPengolah).filter(Boolean))
+  ).map((unit) => ({
     Unit: unit,
     Jumlah: archives.filter((a) => a.unitPengolah === unit).length,
   }));
