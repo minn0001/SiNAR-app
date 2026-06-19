@@ -122,221 +122,100 @@ export default function ArchiveDetail({
     }
   
     printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Label QR - ${archive.nomorArsip}</title>
-          <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body {
-              font-family: sans-serif;
-              background: #f5f5f5;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: flex-start;
-              min-height: 100vh;
-              padding: 40px 20px;
-              gap: 24px;
-            }
-  
-            h1 {
-              font-size: 13px;
-              letter-spacing: 0.15em;
-              text-transform: uppercase;
-              color: #4a4a4a;
-              font-weight: 700;
-            }
-  
-            .card {
-              border: 2px solid #C89B3C;
-              padding: 20px;
-              border-radius: 10px;
-              background: white;
-              width: 380px;
-              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            }
-  
-            .header {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              border-bottom: 1px solid #ccc;
-              padding-bottom: 8px;
-              margin-bottom: 12px;
-            }
-  
-            .header-left {
-              font-size: 10px;
-              font-weight: bold;
-              text-transform: uppercase;
-              letter-spacing: 0.08em;
-              color: #0B1F3A;
-            }
-  
-            .header-code {
-              font-size: 8px;
-              font-family: monospace;
-              background: #f0f0f0;
-              padding: 2px 6px;
-              border-radius: 4px;
-              color: #555;
-            }
-  
-            .body {
-              display: flex;
-              gap: 14px;
-            }
-  
-            .qr-box {
-              background: white;
-              border: 1px solid #ddd;
-              padding: 6px;
-              border-radius: 6px;
-              flex-shrink: 0;
-            }
-  
-            .info {
-              flex: 1;
-              display: flex;
-              flex-direction: column;
-              gap: 6px;
-            }
-  
-            .label {
-              font-size: 7.5px;
-              text-transform: uppercase;
-              color: #888;
-              font-weight: 700;
-              letter-spacing: 0.06em;
-            }
-  
-            .value {
-              font-size: 11px;
-              font-weight: bold;
-              font-family: monospace;
-              color: #0B1F3A;
-              line-height: 1.3;
-            }
-  
-            .value-sm {
-              font-size: 9px;
-              font-weight: bold;
-              color: #0B1F3A;
-              max-width: 180px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-  
-            .grid-2 {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 6px;
-              margin-top: 4px;
-            }
-  
-            .footer {
-              border-top: 1px dashed #ccc;
-              padding-top: 8px;
-              margin-top: 12px;
-              display: flex;
-              justify-content: space-between;
-              font-size: 7.5px;
-              color: #777;
-              text-transform: uppercase;
-              font-family: monospace;
-              font-weight: bold;
-            }
-  
-            .actions {
-              display: flex;
-              gap: 12px;
-              margin-top: 8px;
-            }
-  
-            button {
-              padding: 10px 28px;
-              border-radius: 8px;
-              font-size: 13px;
-              font-weight: bold;
-              cursor: pointer;
-              border: none;
-              transition: opacity 0.2s;
-            }
-  
-            .btn-print {
-              background: #C89B3C;
-              color: white;
-            }
-  
-            .btn-print:hover { opacity: 0.85; }
-  
-            .btn-close {
-              background: #f0f0f0;
-              color: #333;
-            }
-  
-            .btn-close:hover { opacity: 0.75; }
-  
-            @media print {
-              body {
-                background: white;
-                padding: 20px;
-              }
-              .actions { display: none; }
-              .card { box-shadow: none; border-color: #333; }
-            }
-          </style>
-        </head>
-        <body>
-          <h1>Label Tag Arsip Fisik SiNAR</h1>
-  
-          <div class="card">
-            <div class="header">
-              <span class="header-left">Notariat Utama Sinar</span>
-              <span class="header-code">CODE: ${archive.id}</span>
-            </div>
-            <div class="body">
-              <div class="qr-box">
-                ${qrSvgString}
-              </div>
-              <div class="info">
-                <div>
-                  <div class="label">Nomor Arsip:</div>
-                  <div class="value">${archive.nomorArsip}</div>
-                </div>
-                <div>
-                  <div class="label">Judul Akta:</div>
-                  <div class="value-sm">${archive.judulArsip}</div>
-                </div>
-                <div class="grid-2">
-                  <div>
-                    <div class="label">Kategori</div>
-                    <div class="value-sm" style="font-size:8px">${archive.kategori}</div>
-                  </div>
-                  <div>
-                    <div class="label">Tanggal</div>
-                    <div class="value" style="font-size:9px">${archive.tanggalArsip}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="footer">
-              <span>Sistem Pengarsipan Terstruktur</span>
-              <span>Tgl Retensi: ${archive.tanggalRetensi}</span>
-            </div>
-          </div>
-  
-          <div class="actions">
-            <button class="btn-print" onclick="window.print()">🖨️ Print</button>
-            <button class="btn-close" onclick="window.close()">✕ Tutup</button>
-          </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>Label QR - ${archive.nomorArsip}</title>
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          font-family: sans-serif;
+          background: #f5f5f5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          gap: 20px;
+        }
+        h1 {
+          font-size: 12px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: #4a4a4a;
+          font-weight: 700;
+        }
+        .card {
+          background: white;
+          border: 2px solid #C89B3C;
+          border-radius: 12px;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .qr-img { width: 180px; height: 180px; display: block; }
+        .nomor {
+          font-family: monospace;
+          font-size: 13px;
+          font-weight: bold;
+          color: #0B1F3A;
+          letter-spacing: 0.05em;
+        }
+        .hint {
+          font-size: 9px;
+          color: #999;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+        .footer-text {
+          font-size: 8px;
+          color: #aaa;
+          font-family: monospace;
+          text-transform: uppercase;
+        }
+        .actions { display: flex; gap: 12px; }
+        button {
+          padding: 10px 28px;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: bold;
+          cursor: pointer;
+          border: none;
+        }
+        .btn-print { background: #C89B3C; color: white; }
+        .btn-close { background: #f0f0f0; color: #333; }
+        @media print {
+          body { background: white; }
+          .actions { display: none; }
+          .card { box-shadow: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Label Arsip Fisik — SiNAR</h1>
+
+      <div class="card">
+        <div class="hint">Scan untuk melihat detail arsip</div>
+        <img
+          class="qr-img"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.origin + "/?archive=" + archive.id)}"
+          alt="QR Code"
+        />
+        <div class="nomor">${archive.nomorArsip}</div>
+        <div class="footer-text">Notariat Utama Sinar</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+        <button class="btn-close" onclick="window.close()">✕ Tutup</button>
+      </div>
+    </body>
+  </html>
+`);
+printWindow.document.close();
 
   const handleConfirmDelete = (e: React.FormEvent) => {
     e.preventDefault();
