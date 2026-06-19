@@ -482,6 +482,7 @@ export default function ArchiveAddEdit({
                   onChange={(e) => setNamaKlien(e.target.value)}
                   className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A]"
                 />
+                </div>
 
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
