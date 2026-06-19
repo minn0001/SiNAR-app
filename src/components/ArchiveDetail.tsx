@@ -216,6 +216,7 @@ export default function ArchiveDetail({
   </html>
 `);
 printWindow.document.close();
+};
 
   const handleConfirmDelete = (e: React.FormEvent) => {
     e.preventDefault();
