@@ -17,6 +17,8 @@ import {
   Clock
 } from "lucide-react";
 import { AuditLog, User, UserRole } from "../types";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface AuditTrailProps {
   currentUser: User;
@@ -67,17 +69,17 @@ export default function AuditTrail({
   });
 
   const handleExportPDF = () => {
-    const printWindow = window.open("", "_blank", "width=1000,height=700");
+    const printWindow = window.open("", "_blank", "width=100,height=100");
     if (!printWindow) {
-      alert("Mohon izinkan pop-up untuk mencetak PDF.");
+      alert("Mohon izinkan pop-up.");
       return;
     }
   
-    const rows = filteredLogs.map((log) => `
+    const tableRows = filteredLogs.map((log) => `
       <tr>
         <td>${log.timestamp}</td>
         <td>${log.userName.split(",")[0]}<br/><small>${log.userRole}</small></td>
-        <td><span class="badge">${log.action}</span></td>
+        <td>${log.action}</td>
         <td>${log.target}</td>
         <td>${log.ipAddress}<br/><small>${log.device}</small></td>
       </tr>
@@ -88,39 +90,82 @@ export default function AuditTrail({
       <html>
         <head>
           <title>Audit Trail - SiNAR</title>
-          <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: sans-serif; padding: 32px; color: #0B1F3A; font-size: 11px; }
-            h1 { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
-            p { color: #718096; font-size: 10px; margin-bottom: 20px; }
-            table { width: 100%; border-collapse: collapse; }
-            th { background: #F5E6C8; padding: 8px 10px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #C89B3C; }
-            td { padding: 7px 10px; border-bottom: 1px solid #E8DCC8; vertical-align: top; }
-            tr:nth-child(even) { background: #FAFAF8; }
-            small { color: #718096; font-size: 9px; }
-            .badge { background: #F5E6C8; color: #A67C2D; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: bold; text-transform: uppercase; }
-            .footer { margin-top: 20px; font-size: 9px; color: #718096; text-align: right; }
-            @media print { body { padding: 16px; } }
-          </style>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
         </head>
         <body>
-          <h1>Log Riwayat Audit Trail — SiNAR Arsip Digital</h1>
-          <p>Diekspor pada: ${new Date().toLocaleString("id-ID")} | Total: ${filteredLogs.length} entri</p>
-          <table>
-            <thead>
-              <tr>
-                <th>Waktu (WIB)</th>
-                <th>Operator</th>
-                <th>Tindakan</th>
-                <th>Target</th>
-                <th>IP / Perangkat</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-          <div class="footer">SiNAR – Sistem Arsip Digital Notariat | Dokumen ini bersifat rahasia</div>
           <script>
-            window.onload = function() { window.print(); }
+            window.onload = function() {
+              const { jsPDF } = window.jspdf;
+              const doc = new jsPDF({ orientation: "landscape" });
+  
+              // Header navy
+              doc.setFillColor(11, 31, 58);
+              doc.rect(0, 0, 297, 30, "F");
+              doc.setTextColor(200, 155, 60);
+              doc.setFontSize(13);
+              doc.setFont("helvetica", "bold");
+              doc.text("KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn.", 14, 11);
+              doc.setTextColor(255, 255, 255);
+              doc.setFontSize(8);
+              doc.setFont("helvetica", "normal");
+              doc.text("Jl. Sudirman No. 45, Jakarta Selatan  |  Telp. (021) 5551234  |  notaris.rinamaharani@gmail.com", 14, 18);
+              doc.setTextColor(200, 155, 60);
+              doc.setFontSize(7);
+              doc.text("SiNAR - Sistem Arsip Digital", 14, 25);
+  
+              // Judul
+              doc.setTextColor(11, 31, 58);
+              doc.setFontSize(14);
+              doc.setFont("helvetica", "bold");
+              doc.text("LOG RIWAYAT AUDIT TRAIL", 148, 42, { align: "center" });
+              doc.setFontSize(9);
+              doc.setFont("helvetica", "normal");
+              doc.setTextColor(100, 100, 100);
+              doc.text("Perekaman menyeluruh kegiatan akses dokumen, login operator, dan sirkulasi draf notarisan", 148, 49, { align: "center" });
+              doc.text("Dicetak pada: ${new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}", 148, 55, { align: "center" });
+  
+              // Garis emas
+              doc.setDrawColor(200, 155, 60);
+              doc.setLineWidth(0.5);
+              doc.line(14, 58, 283, 58);
+  
+              // Tabel
+              doc.autoTable({
+                startY: 63,
+                head: [["Waktu (WIB)", "Operator", "Peran", "Tindakan", "Target", "IP Address", "Perangkat"]],
+                body: ${JSON.stringify(filteredLogs.map((log) => [
+                  log.timestamp,
+                  log.userName.split(",")[0],
+                  log.userRole,
+                  log.action,
+                  log.target,
+                  log.ipAddress,
+                  log.device
+                ]))},
+                headStyles: { fillColor: [245, 230, 200], textColor: [11, 31, 58], fontStyle: "bold", fontSize: 8 },
+                bodyStyles: { fontSize: 7.5, textColor: [50, 50, 50] },
+                alternateRowStyles: { fillColor: [250, 250, 248] },
+                styles: { lineColor: [232, 220, 200], lineWidth: 0.2 },
+                columnStyles: {
+                  0: { cellWidth: 30 }, 1: { cellWidth: 35 }, 2: { cellWidth: 25 },
+                  3: { cellWidth: 28 }, 4: { cellWidth: 70 }, 5: { cellWidth: 28 }, 6: { cellWidth: 45 }
+                }
+              });
+  
+              // Footer total
+              const finalY = doc.lastAutoTable.finalY + 8;
+              doc.setFillColor(253, 248, 240);
+              doc.setDrawColor(200, 155, 60);
+              doc.rect(14, finalY, 269, 10, "FD");
+              doc.setTextColor(11, 31, 58);
+              doc.setFontSize(9);
+              doc.setFont("helvetica", "bold");
+              doc.text("TOTAL KESELURUHAN LOG: ${filteredLogs.length} entri", 20, finalY + 6.5);
+  
+              doc.save("AuditTrail_SiNAR_${new Date().toISOString().split("T")[0]}.pdf");
+              setTimeout(() => window.close(), 1000);
+            };
           </script>
         </body>
       </html>
