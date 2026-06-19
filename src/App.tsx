@@ -284,6 +284,12 @@ export default function App() {
   if (!targetDoc) return;
 
   await supabase.from('arsip').delete().eq('data->>id', id);
+  const fileName = targetDoc.fileDokumen?.url?.split("/dokumen-arsip/")[1];
+  if (fileName) {
+    await supabase.storage.from("dokumen-arsip").remove([fileName]);
+  }
+
+setAllArchives(prev => prev.filter((a) => a.id !== id));
   setAllArchives(prev => prev.filter((a) => a.id !== id));
   appendAuditLog("Hapus Arsip", `${targetDoc.nomorArsip} (${targetDoc.judulArsip})`, currentUser);
   
