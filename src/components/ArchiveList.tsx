@@ -67,6 +67,9 @@ export default function ArchiveList({
   // Document preview modal state
   const [archiveToPreview, setArchiveToPreview] = useState<Archive | null>(null);
   const [viewerZoom, setViewerZoom] = useState<number>(100);
+  // --- Status proses cetak/unduh di modal preview ---
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Resets filters
   const resetFilters = () => {
@@ -212,6 +215,120 @@ export default function ArchiveList({
         return "text-amber-600 bg-white border border-amber-200";
       case KategoriArsip.DOKUMEN_PENDUKUNG:
         return "text-slate-600 bg-white border border-slate-200";
+    }
+  };
+
+  // --- FIX: Unduh berkas asli dari Supabase Storage (atau base64 mock) ---
+  // Sebelumnya hanya bekerja untuk file base64 ("data:"); sekarang juga
+  // menangani URL biasa (https://...supabase.co/...) dengan fetch + blob,
+  // supaya nama file unduhan tetap sesuai nama aslinya.
+  const handleDownloadPreviewFile = async (archive: Archive) => {
+    const file = archive.fileDokumen;
+    if (!file?.url) {
+      alert("Berkas digital tidak ditemukan.");
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      if (file.url.startsWith("data:")) {
+        // Mock/base64 file: unduh langsung
+        const link = document.createElement("a");
+        link.href = file.url;
+        link.download = file.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // File asli di Supabase Storage: fetch sebagai blob agar nama file
+        // unduhan benar (kalau pakai <a download> langsung ke URL lintas-origin,
+        // browser akan mengabaikan atribut download dan cuma membuka tab baru).
+        const response = await fetch(file.url);
+        if (!response.ok) throw new Error("Gagal mengambil berkas dari server.");
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = file.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }
+    } catch (err) {
+      console.error("Gagal mengunduh berkas:", err);
+      // Fallback: buka di tab baru supaya user tetap bisa menyimpan manual
+      window.open(file.url, "_blank");
+      alert("Unduhan otomatis gagal, berkas dibuka di tab baru. Silakan simpan secara manual (klik kanan > Save As).");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  // --- FIX: Cetak berkas asli — buka file di tab baru lalu panggil print() ---
+  // Untuk PDF asli: buka langsung URL-nya (browser akan render PDF viewer bawaan,
+  // lalu kita panggil window.print() begitu termuat).
+  // Untuk dokumen mock (tanpa file asli): cetak konten preview yang sedang tampil di modal.
+  const handlePrintPreviewFile = (archive: Archive) => {
+    const file = archive.fileDokumen;
+    const isMockFile = !file || !file.url || file.url.startsWith("/") || file.url.includes("pdfobject.com");
+
+    if (isMockFile) {
+      // Cetak elemen mock-template yang sedang ditampilkan di modal preview
+      const previewNode = document.getElementById("preview-modal-content");
+      if (!previewNode) {
+        alert("Konten pratinjau tidak ditemukan untuk dicetak.");
+        return;
+      }
+      const printWindow = window.open("", "_blank", "width=850,height=1000");
+      if (!printWindow) {
+        alert("Mohon izinkan pop-up untuk mencetak dokumen.");
+        return;
+      }
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Cetak - ${archive.nomorArsip}</title>
+            <style>
+              body { font-family: Georgia, 'Times New Roman', serif; padding: 24px; color: #1e293b; }
+              * { box-sizing: border-box; }
+            </style>
+          </head>
+          <body>${previewNode.innerHTML}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.onload = () => {
+        printWindow.focus();
+        printWindow.print();
+      };
+      return;
+    }
+
+    setIsPrinting(true);
+    try {
+      const printWindow = window.open(file.url, "_blank");
+      if (!printWindow) {
+        alert("Mohon izinkan pop-up untuk mencetak dokumen.");
+        return;
+      }
+      // Beri waktu file (terutama PDF) untuk termuat sebelum memicu dialog cetak
+      printWindow.addEventListener("load", () => {
+        printWindow.focus();
+        printWindow.print();
+      });
+      // Fallback timer kalau event 'load' tidak terpicu (mis. PDF native viewer)
+      setTimeout(() => {
+        try {
+          printWindow.focus();
+          printWindow.print();
+        } catch {
+          /* tab sudah ditutup atau lintas-origin, abaikan */
+        }
+      }, 1500);
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -702,7 +819,7 @@ export default function ArchiveList({
             </div>
 
             {/* Document Render Area (Page Mockup) */}
-            <div className="p-6 bg-[#F5F0E8] border-b border-[#E8DCC8] flex justify-center items-start overflow-auto flex-1 select-text max-h-[550px]">
+            <div id="preview-modal-content" className="p-6 bg-[#F5F0E8] border-b border-[#E8DCC8] flex justify-center items-start overflow-auto flex-1 select-text max-h-[550px]">
               {(() => {
                 const isMockFile = !archiveToPreview.fileDokumen || !archiveToPreview.fileDokumen.url || archiveToPreview.fileDokumen.url.startsWith("/") || archiveToPreview.fileDokumen.url.includes("pdfobject.com");
                 
@@ -956,28 +1073,18 @@ export default function ArchiveList({
               <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-500" /> Tinjauan digital terverifikasi SHA-256</span>
               <div className="flex items-center gap-3">
                 <button 
-                  onClick={() => alert(`Menyiapkan berkas ${archiveToPreview.fileDokumen?.filename || "dokumen.pdf"} untuk proses pencetakan.`)} 
-                  className="px-3 py-1.5 bg-white border border-[#D4B896] hover:bg-[#FDF8F0] text-[#0B1F3A] rounded-md transition flex items-center gap-1.5 cursor-pointer font-semibold font-sans text-xs"
+                  onClick={() => handlePrintPreviewFile(archiveToPreview)}
+                  disabled={isPrinting}
+                  className="px-3 py-1.5 bg-white border border-[#D4B896] hover:bg-[#FDF8F0] text-[#0B1F3A] rounded-md transition flex items-center gap-1.5 cursor-pointer font-semibold font-sans text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Printer className="w-3.5 h-3.5" /> Cetak
+                  <Printer className="w-3.5 h-3.5" /> {isPrinting ? "Menyiapkan..." : "Cetak"}
                 </button>
                 <button 
-                  onClick={() => {
-                    const file = archiveToPreview.fileDokumen;
-                    if (file?.url?.startsWith("data:")) {
-                      const link = document.createElement("a");
-                      link.href = file.url;
-                      link.download = file.filename;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    } else {
-                      alert(`Berkas digital ${file?.filename || "dokumen.pdf"} (${((file?.size || 1542000) / (1024 * 1024)).toFixed(2)} MB) berhasil diunduh secara aman lewat saluran transkripsi SSL.`);
-                    }
-                  }} 
-                  className="px-3.5 py-1.5 bg-gold-royal hover:bg-gold-dark text-white rounded-md transition flex items-center gap-1.5 cursor-pointer font-semibold font-sans text-xs"
+                  onClick={() => handleDownloadPreviewFile(archiveToPreview)}
+                  disabled={isDownloading}
+                  className="px-3.5 py-1.5 bg-gold-royal hover:bg-gold-dark text-white rounded-md transition flex items-center gap-1.5 cursor-pointer font-semibold font-sans text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Download className="w-3.5 h-3.5" /> Unduh PDF
+                  <Download className="w-3.5 h-3.5" /> {isDownloading ? "Mengunduh..." : "Unduh PDF"}
                 </button>
               </div>
             </div>
