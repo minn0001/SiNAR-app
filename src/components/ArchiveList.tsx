@@ -1042,7 +1042,7 @@ export default function ArchiveList({
                   return (
                     <div className="w-full">
                       <object
-                        data={archive.fileDokumen.url}
+                        data={archiveToPreview.fileDokumen.url}  // ← ganti archive → archiveToPreview
                         type="application/pdf"
                         width="100%"
                         height="500px"
@@ -1051,7 +1051,7 @@ export default function ArchiveList({
                         <p className="text-xs text-[#718096] text-center p-4">
                           Browser Anda tidak mendukung tampilan PDF langsung. 
                           <button 
-                            onClick={handleDownload}
+                            onClick={() => window.open(archiveToPreview.fileDokumen.url, "_blank")}
                             className="text-gold-royal underline ml-1"
                           >
                             Unduh berkas
