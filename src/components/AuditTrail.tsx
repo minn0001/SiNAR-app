@@ -66,10 +66,96 @@ export default function AuditTrail({
     return matchesSearch && matchesUser && matchesAction && matchesDate;
   });
 
-  const triggerExport = (format: "PDF" | "Excel") => {
-    alert(`[Security Audit Export] Seluruh ${filteredLogs.length} entri audit log tersaring berhasil diekspor ke berkas ${format === "PDF" ? "PDF Bersegel KPT (.pdf)" : "Spreadsheet Audit (.xlsx)"}.`);
+  const handleExportPDF = () => {
+    const printWindow = window.open("", "_blank", "width=1000,height=700");
+    if (!printWindow) {
+      alert("Mohon izinkan pop-up untuk mencetak PDF.");
+      return;
+    }
+  
+    const rows = filteredLogs.map((log) => `
+      <tr>
+        <td>${log.timestamp}</td>
+        <td>${log.userName.split(",")[0]}<br/><small>${log.userRole}</small></td>
+        <td><span class="badge">${log.action}</span></td>
+        <td>${log.target}</td>
+        <td>${log.ipAddress}<br/><small>${log.device}</small></td>
+      </tr>
+    `).join("");
+  
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Audit Trail - SiNAR</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: sans-serif; padding: 32px; color: #0B1F3A; font-size: 11px; }
+            h1 { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+            p { color: #718096; font-size: 10px; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th { background: #F5E6C8; padding: 8px 10px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #C89B3C; }
+            td { padding: 7px 10px; border-bottom: 1px solid #E8DCC8; vertical-align: top; }
+            tr:nth-child(even) { background: #FAFAF8; }
+            small { color: #718096; font-size: 9px; }
+            .badge { background: #F5E6C8; color: #A67C2D; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: bold; text-transform: uppercase; }
+            .footer { margin-top: 20px; font-size: 9px; color: #718096; text-align: right; }
+            @media print { body { padding: 16px; } }
+          </style>
+        </head>
+        <body>
+          <h1>Log Riwayat Audit Trail — SiNAR Arsip Digital</h1>
+          <p>Diekspor pada: ${new Date().toLocaleString("id-ID")} | Total: ${filteredLogs.length} entri</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu (WIB)</th>
+                <th>Operator</th>
+                <th>Tindakan</th>
+                <th>Target</th>
+                <th>IP / Perangkat</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div class="footer">SiNAR – Sistem Arsip Digital Notariat | Dokumen ini bersifat rahasia</div>
+          <script>
+            window.onload = function() { window.print(); }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
-
+  
+  const handleExportExcel = () => {
+    // Buat CSV yang bisa dibuka Excel
+    const headers = ["Waktu", "Nama Operator", "Peran", "Tindakan", "Target", "IP Address", "Perangkat"];
+    const rows = filteredLogs.map((log) => [
+      log.timestamp,
+      log.userName.split(",")[0],
+      log.userRole,
+      log.action,
+      log.target,
+      log.ipAddress,
+      log.device
+    ]);
+  
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+  
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `AuditTrail_SiNAR_${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+  
   // Helper mock security badges for action types
   const getActionTheme = (action: string) => {
     switch (action) {
@@ -107,13 +193,13 @@ export default function AuditTrail({
         {/* Action Export Buttons */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => triggerExport("PDF")}
+            onClick={handleExportPDF}
             className="px-3 py-1.5 text-xs font-bold bg-[#FAFAF8] hover:bg-[#FDF8F0] hover:text-[#C89B3C] border border-[#D4B896] hover:border-[#C89B3C] text-[#0B1F3A] rounded transition cursor-pointer flex items-center gap-1.5"
           >
             <FileDown className="w-3.5 h-3.5" /> Cetak Audit PDF
           </button>
           <button
-            onClick={() => triggerExport("Excel")}
+            onClick={handleExportExcel}
             className="px-3 py-1.5 text-xs font-bold bg-[#C89B3C] text-white hover:bg-[#A67C2D] rounded transition cursor-pointer flex items-center gap-1.5"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" /> Export Excel
