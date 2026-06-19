@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
- 
+
 import React, { useState, useEffect } from "react";
 import { createClient } from '@supabase/supabase-js';
 import { 
@@ -19,15 +19,15 @@ import {
   History
 } from "lucide-react";
 import { Archive, KategoriArsip, StatusArsip, User, DocumentVersion } from "../types";
- 
+
 // --- RBAC IMPORT ---
 import { canAccessKategori } from "../lib/permissions";
- 
+
 const supabase = createClient(
   'https://mdcoxcwtgveczzvbjwzx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kY294Y3d0Z3ZlY3p6dmJqd3p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDE4MTQsImV4cCI6MjA5NjcxNzgxNH0.CsfMpWulQPrizMRyzZVleSC17nIHtZVO2Ru_8H7kQgs'
 );
- 
+
 interface ArchiveAddEditProps {
   mode: "add" | "edit";
   archives: Archive[];
@@ -37,7 +37,7 @@ interface ArchiveAddEditProps {
   activeArchiveId?: string | null;
   systemConfig: SystemConfig;
 }
- 
+
 export default function ArchiveAddEdit({
   mode,
   archives,
@@ -52,12 +52,12 @@ export default function ArchiveAddEdit({
   const allowedKategori = Object.values(KategoriArsip).filter((cat) =>
     canAccessKategori(currentUser, cat)
   );
- 
+
   // Find current archive if editing
   const existingArchive = mode === "edit" && activeArchiveId 
     ? archives.find(a => a.id === activeArchiveId) 
     : null;
- 
+
   // Form states
   const [judulArsip, setJudulArsip] = useState("");
   const [nomorArsip, setNomorArsip] = useState("");
@@ -76,7 +76,7 @@ export default function ArchiveAddEdit({
   // Tag fields
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
- 
+
   // File Upload states (mocked with realistic metadata)
   const [uploadedFile, setUploadedFile] = useState<{
     filename: string;
@@ -86,11 +86,11 @@ export default function ArchiveAddEdit({
     uploadedBy: string;
     type?: string;
   } | null>(null);
- 
+
   const [dragOver, setDragOver] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [versionNote, setVersionNote] = useState("Unggah revisi atau perbaikan draf penyesuaian");
- 
+
   // Load existing data if editing
   useEffect(() => {
     if (mode === "edit" && existingArchive) {
@@ -131,7 +131,7 @@ export default function ArchiveAddEdit({
     }
     setFormErrors({});
   }, [mode, existingArchive]);
- 
+
   // Map Category to standard retention periods (Autofill trigger)
   const updateDefaultRetention = (selectedCat: KategoriArsip) => {
     const val = systemConfig.defaultRetensi[selectedCat];
@@ -142,13 +142,13 @@ export default function ArchiveAddEdit({
       setMasaRetensi(val as number);
     }
   };
- 
+
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value as KategoriArsip;
     setKategori(val);
     updateDefaultRetention(val);
   };
- 
+
   // Roman Numeral generator helper for Archive Numbers
   const getRomanMonth = (dateStr: string): string => {
     try {
@@ -159,7 +159,7 @@ export default function ArchiveAddEdit({
       return "VI";
     }
   };
- 
+
   // Auto-generate Archive Number based on Format
   useEffect(() => {
     if (mode === "add" && tanggalArsip && kategori) {
@@ -185,7 +185,7 @@ export default function ArchiveAddEdit({
       setNomorArsip(generated);
     }
   }, [tanggalArsip, kategori, mode, archives.length, systemConfig.nomorFormat]);
- 
+
   // TAG OPERATIONS
   const handleAddTag = () => {
     const trimmed = tagInput.trim();
@@ -194,30 +194,30 @@ export default function ArchiveAddEdit({
       setTagInput("");
     }
   };
- 
+
   const handleRemoveTag = (index: number) => {
     setTags(tags.filter((_, idx) => idx !== index));
   };
- 
+
   // HANDLE MOCK FILE UPLOAD
   const handleFileSelect = async (targetFiles: FileList | null) => {
     if (!targetFiles || targetFiles.length === 0) return;
     const file = targetFiles[0];
- 
+
     // Validation checks
     const ext = file.name.split(".").pop()?.toLowerCase();
     const sizeMB = file.size / (1024 * 1024);
- 
+
     if (ext !== "pdf" && ext !== "jpg" && ext !== "jpeg") {
       setFormErrors({ ...formErrors, file: "Koreksi format file. Sistem hanya menerima file berekstensi PDF atau JPG." });
       return;
     }
- 
+
     if (sizeMB > 10) {
       setFormErrors({ ...formErrors, file: `Ukuran file melebihi kapasitas. Maksimal ukuran file 10MB (file Anda: ${sizeMB.toFixed(1)}MB).` });
       return;
     }
- 
+
 // Upload to Supabase Storage
     const fileName = `${Date.now()}_${file.name}`;
     const { error } = await supabase.storage
@@ -228,11 +228,11 @@ export default function ArchiveAddEdit({
       setFormErrors({ ...formErrors, file: "Gagal mengupload file. Coba lagi." });
       return;
     }
- 
+
     const { data: urlData } = supabase.storage
       .from('dokumen-arsip')
       .getPublicUrl(fileName);
- 
+
     setUploadedFile({
       filename: file.name,
       size: file.size,
@@ -247,40 +247,40 @@ export default function ArchiveAddEdit({
     delete errorsCopy.file;
     setFormErrors(errorsCopy);
   };
- 
+
   // Drag and drop listeners
   const onDragover = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(true);
   };
- 
+
   const onDragleave = () => {
     setDragOver(false);
   };
- 
+
   const onDropfile = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
     handleFileSelect(e.dataTransfer.files);
   };
- 
+
   // VALIDATE & SUBMIT FORM
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errors: Record<string, string> = {};
- 
+
     if (!judulArsip.trim()) errors.judul = "Judul arsip wajib diisi.";
     if (!nomorArsip.trim()) errors.nomor = "Nomor urut arsip wajib diisi.";
     if (!tanggalArsip) errors.tanggal = "Pilih tanggal pengesahan arsip.";
     if (!uploadedFile) errors.file = "Unggah berkas dokumen utama (PDF/JPG) berkas.";
- 
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       // scroll to error banner
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
- 
+
     // Calculate dynamic retention expiry date: tanggalArsip + masaRetensi (in years)
     let tanggalRetensi = "";
     try {
@@ -290,14 +290,14 @@ export default function ArchiveAddEdit({
     } catch {
       tanggalRetensi = "2036-06-08"; // fallback
     }
- 
+
     // Version Control Integration
     let mergedVersions: DocumentVersion[] = [];
     if (mode === "edit" && existingArchive) {
       
       // If a new file is uploaded or even if meta is edited, check if document details changed
       const hasNewFile = uploadedFile?.filename !== existingArchive.fileDokumen.filename;
- 
+
       if (hasNewFile) {
         // Record the previous version from existing fileDokumen state
         const oldVersionRecord: DocumentVersion = {
@@ -324,7 +324,7 @@ export default function ArchiveAddEdit({
       };
       mergedVersions = [initialVersion];
     }
- 
+
     const payload: Archive = {
       id: mode === "edit" && existingArchive ? existingArchive.id : `arc-gen-${Date.now()}`,
       nomorArsip: nomorArsip.trim(),
@@ -354,10 +354,10 @@ export default function ArchiveAddEdit({
       updatedBy: currentUser.id,
       updatedAt: new Date().toISOString().replace("T", " ").substring(0, 16)
     };
- 
+
     onSave(payload);
   };
- 
+
   return (
     <div className="space-y-6">
       {/* HEADER BREADCRUMB */}
@@ -373,7 +373,7 @@ export default function ArchiveAddEdit({
           <X className="w-4 h-4" /> Batal &amp; Kembali
         </button>
       </div>
- 
+
       {Object.keys(formErrors).length > 0 && (
         <div className="p-4 bg-red-55 border-l-4 border-red-500 text-red-700 rounded-lg flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-550 shrink-0 mt-0.5" />
@@ -383,7 +383,7 @@ export default function ArchiveAddEdit({
           </div>
         </div>
       )}
- 
+
       {/* FORM WRAPPER */}
       <form onSubmit={handleFormSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6" id="archive-add-edit-form">
         
@@ -392,7 +392,7 @@ export default function ArchiveAddEdit({
           <h3 className="text-base font-semibold font-display text-[#0B1F3A] border-b border-[#E8DCC8]/65 pb-3 flex items-center gap-1.5 uppercase tracking-wide">
             <FileText className="w-5 h-5 text-[#C89B3C]" /> Informasi Utama Arsip
           </h3>
- 
+
           <div className="space-y-4">
             {/* Judul */}
             <div className="space-y-1.5">
@@ -411,7 +411,7 @@ export default function ArchiveAddEdit({
               />
               {formErrors.judul && <p className="text-[10px] text-red-500 italic">{formErrors.judul}</p>}
             </div>
- 
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Nomor Arsip */}
               <div className="space-y-1.5">
@@ -430,7 +430,7 @@ export default function ArchiveAddEdit({
                 />
                 <span className="text-[9px] text-[#718096] leading-none">Auto-generasi berdasar format. Dapat disunting.</span>
               </div>
- 
+
               {/* Tanggal */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
@@ -445,7 +445,7 @@ export default function ArchiveAddEdit({
                 />
               </div>
             </div>
- 
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Kategori — RBAC: hanya menampilkan kategori yang diizinkan untuk peran ini */}
               <div className="space-y-1.5">
@@ -468,7 +468,7 @@ export default function ArchiveAddEdit({
                   </span>
                 )}
               </div>
- 
+
               {/* Status */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
@@ -485,7 +485,7 @@ export default function ArchiveAddEdit({
                 </select>
               </div>
             </div>
- 
+
             {/* Nama Klien & Unit */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
@@ -500,7 +500,7 @@ export default function ArchiveAddEdit({
                   className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A]"
                 />
               </div>
- 
+
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
                   Unit Pengolah Arsip
@@ -517,7 +517,7 @@ export default function ArchiveAddEdit({
                 </select>
               </div>
             </div>
- 
+
             {/* Keterangan & Lokasi Fisik */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5 sm:col-span-2">
@@ -547,7 +547,7 @@ export default function ArchiveAddEdit({
                 <span className="text-[9px] text-[#718096] leading-none block">Format: Lemari-Rak-Box</span>
               </div>
             </div>
- 
+
           </div>
         </div>
         
@@ -559,7 +559,7 @@ export default function ArchiveAddEdit({
             <h4 className="text-xs font-bold text-[#718096] uppercase tracking-widest block">
               File Berkas Digital <span className="text-red-500">*</span>
             </h4>
- 
+
             {/* Drop Container Area */}
             {!uploadedFile ? (
               <div 
@@ -595,7 +595,7 @@ export default function ArchiveAddEdit({
                 >
                   <Trash className="w-4 h-4" />
                 </button>
- 
+
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 bg-red-100 text-red-650 rounded">
                     <span className="font-bold text-xs font-mono">PDF</span>
@@ -607,7 +607,7 @@ export default function ArchiveAddEdit({
                     </span>
                   </div>
                 </div>
- 
+
                 <div className="text-[9px] text-[#718096] font-mono pt-2 border-t border-[#E8DCC8]/65 leading-relaxed">
                   <span>Diupload pada: {uploadedFile.uploadedAt} WIB</span>
                   <span className="block italic">Pemberi Berkas: digital_operator_{uploadedFile.uploadedBy}</span>
@@ -616,7 +616,7 @@ export default function ArchiveAddEdit({
             )}
             {formErrors.file && <p className="text-[10px] text-red-500 italic mt-1">{formErrors.file}</p>}
           </div>
- 
+
           {/* EDIT VERSION NOTES PANEL (Only displayed if modifying document file in Edit Mode) */}
           {mode === "edit" && existingArchive && uploadedFile && uploadedFile.filename !== existingArchive.fileDokumen.filename && (
             <div className="bg-white p-6 rounded-xl border border-gold-royal/30 shadow-[0_2px_12px_rgba(11,31,58,0.08)] space-y-3 animate-slideIn">
@@ -638,13 +638,13 @@ export default function ArchiveAddEdit({
               </div>
             </div>
           )}
- 
+
           {/* RETENTION METADATA BLOCK */}
           <div className="bg-white p-6 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] space-y-4">
             <h4 className="text-xs font-bold text-[#718096] uppercase tracking-widest block border-b border-[#E8DCC8]/65 pb-2">
               Pengaturan Retensi Hukum
             </h4>
- 
+
             <div className="space-y-3.5">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
@@ -663,7 +663,7 @@ export default function ArchiveAddEdit({
                   Akta AJB: {systemConfig.defaultRetensi[KategoriArsip.AKTA_JUAL_BELI]} th | Surat Kuasa: {systemConfig.defaultRetensi[KategoriArsip.SURAT_KUASA]} th | Perjanjian: {systemConfig.defaultRetensi[KategoriArsip.PERJANJIAN]} th
                 </span>
               </div>
- 
+
               <div className="p-3.5 bg-[#FAFAF8] border border-[#E8DCC8] rounded-lg text-[11px] text-[#718096] leading-relaxed font-sans">
                 Dengan masa retensi <strong className="text-gold-royal">{masaRetensi} Tahun</strong>, perkiraan tanggal retensi jatuh pada: <strong className="text-[#0B1F3A]">
                   {tanggalArsip ? (parseInt(tanggalArsip.split("-")[0]) + masaRetensi) + tanggalArsip.substring(4) : "2036-06-08"}
@@ -671,13 +671,13 @@ export default function ArchiveAddEdit({
               </div>
             </div>
           </div>
- 
+
           {/* DYNAMIC TAG INPUT FIELD */}
           <div className="bg-white p-6 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] space-y-3">
             <h4 className="text-xs font-bold text-[#718096] uppercase tracking-widest block font-display">
               Label / Kata Kunci (Tag)
             </h4>
- 
+
             <div className="flex gap-2">
               <input
                 type="text"
@@ -695,7 +695,7 @@ export default function ArchiveAddEdit({
                 <Plus className="w-4 h-4" />
               </button>
             </div>
- 
+
             {/* Render selected tags list */}
             {tags.length > 0 ? (
               <div className="flex flex-wrap gap-1.5 pt-1.5">
@@ -719,7 +719,7 @@ export default function ArchiveAddEdit({
               <span className="text-[10px] text-[#718096] italic block pt-1">Belum ada label disematkan. Klik Enter untuk menambah label.</span>
             )}
           </div>
- 
+
           {/* SUBMIT FORM BUTTONS ACTIONS */}
           <div className="flex gap-3 grid grid-cols-2">
             <button
@@ -737,9 +737,9 @@ export default function ArchiveAddEdit({
               Simpan Arsip
             </button>
           </div>
- 
+
         </div>
- 
+
       </form>
     </div>
   );
