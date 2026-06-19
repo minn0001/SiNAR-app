@@ -253,6 +253,7 @@ export default function ArchiveAddEdit({
     if (!judulArsip.trim()) errors.judul = "Judul arsip wajib diisi.";
     if (!nomorArsip.trim()) errors.nomor = "Nomor urut arsip wajib diisi.";
     if (!tanggalArsip) errors.tanggal = "Pilih tanggal pengesahan arsip.";
+    if (!namaKlien.trim()) errors.klien = "Nama klien wajib diisi.";
     if (!lokasiFisik.trim()) errors.lokasi = "Lokasi fisik penyimpanan wajib diisi.";
     if (!uploadedFile) errors.file = "Unggah berkas dokumen utama (PDF/JPG) berkas.";
 
@@ -471,16 +472,16 @@ export default function ArchiveAddEdit({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
-                  Nama Klien / Pihak Utama
+                  Nama Klien / Pihak Utama <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
+                  required
                   placeholder="Nama klien atau perseroan"
                   value={namaKlien}
                   onChange={(e) => setNamaKlien(e.target.value)}
                   className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A]"
                 />
-              </div>
 
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
@@ -521,15 +522,13 @@ export default function ArchiveAddEdit({
                 <input
                   type="text"
                   required
-                  placeholder="L1-R3-B12"
+                  placeholder="cth: L1-R3-B12"
                   value={lokasiFisik}
                   onChange={(e) => setLokasiFisik(e.target.value.toUpperCase())}
-                  className="..."
+                  className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] font-mono placeholder-[#A0AEC0]"
                 />
                 <span className="text-[9px] text-[#718096] leading-none block">Format: Lemari-Rak-Box</span>
               </div>
-            </div>
-
           </div>
         </div>
         
