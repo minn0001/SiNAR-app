@@ -634,16 +634,28 @@ printWindow.document.close();
                                 archive.fileDokumen?.filename?.toLowerCase().endsWith(".png");
 
                 if (isPdf) {
-                 const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(archive.fileDokumen.url)}&embedded=true`;
-                 return (
-                   <iframe
-                     src={googleViewerUrl}
-                     width="100%"
-                     height="500px"
-                     style={{ borderRadius: "8px", border: "1px solid #E8DCC8" }}
-                   />
-                 );
-               }
+                  return (
+                    <div className="w-full">
+                      <object
+                        data={archive.fileDokumen.url}
+                        type="application/pdf"
+                        width="100%"
+                        height="500px"
+                        style={{ borderRadius: "8px", border: "1px solid #E8DCC8" }}
+                      >
+                        <p className="text-xs text-[#718096] text-center p-4">
+                          Browser Anda tidak mendukung tampilan PDF langsung. 
+                          <button 
+                            onClick={handleDownload}
+                            className="text-gold-royal underline ml-1"
+                          >
+                            Unduh berkas
+                          </button>
+                        </p>
+                      </object>
+                    </div>
+                  );
+                }
                 else if (isImage) {
                   return (
                     <img 
