@@ -27,6 +27,9 @@ import SessionTimeoutModal from "./components/SessionTimeoutModal";
 import { mockUsers, mockArchives, mockAuditLogs, defaultSystemConfig } from "./mockData";
 import { Archive, User, AuditLog, SystemConfig } from "./types";
 
+// --- RBAC IMPORTS ---
+import { can, canAccessPage, canAccessKategori, canEdit } from "./lib/permissions";
+
 const SESSION_LIMIT = 30 * 60; // 30 minutes in seconds
 const WARNING_LIMIT = 5 * 60; // 5 minutes in seconds
 
@@ -206,8 +209,16 @@ export default function App() {
   };
 
   // Navigates and triggers soft updates
+  // --- RBAC GUARD: cek izin halaman sebelum navigasi ---
   const handleNavigate = (page: string, activeId: string | null = null) => {
     resetActivityTimer();
+
+    // Halaman LOGIN selalu boleh diakses
+    if (page !== "LOGIN" && !canAccessPage(currentUser, page)) {
+      showToast("Anda tidak memiliki akses ke halaman ini.", "error");
+      return; // batalkan navigasi, tetap di halaman semula
+    }
+
     setCurrentPage(page);
     if (activeId !== null) {
       setActiveArchiveId(activeId);
@@ -215,16 +226,30 @@ export default function App() {
   };
 
   // Archive edits or creation saves
+  // --- RBAC GUARD: cek izin tambah/edit sebelum simpan ---
   const handleSaveArchive = async (archive: Archive) => {
   if (!currentUser) return;
 
   const isNew = !allArchives.find((a) => a.id === archive.id);
 
   if (isNew) {
+    if (!can(currentUser, "tambah_arsip")) {
+      showToast("Anda tidak memiliki izin untuk menambah arsip.", "error");
+      return;
+    }
+    if (!canAccessKategori(currentUser, archive.kategori)) {
+      showToast("Peran Anda hanya dapat menambah arsip kategori Akta.", "error");
+      return;
+    }
     await supabase.from('arsip').insert({ data: archive });
     setAllArchives(prev => [archive, ...prev]);
     appendAuditLog("Tambah Arsip", archive.nomorArsip, currentUser);
   } else {
+    const existing = allArchives.find((a) => a.id === archive.id)!;
+    if (!canEdit(currentUser, existing)) {
+      showToast("Anda tidak memiliki izin untuk mengedit arsip ini.", "error");
+      return;
+    }
     await supabase.from('arsip').update({ data: archive }).eq('data->>id', archive.id);
     setAllArchives(prev => prev.map((a) => (a.id === archive.id ? archive : a)));
     appendAuditLog("Edit Arsip", archive.nomorArsip, currentUser);
@@ -239,8 +264,15 @@ export default function App() {
   };
 
   // Delete gate action
+  // --- RBAC GUARD: hanya Admin yang boleh hapus ---
   const handleDeleteArchive = async (id: string) => {
   if (!currentUser) return;
+
+  if (!can(currentUser, "hapus_arsip")) {
+    showToast("Hanya Admin yang dapat menghapus arsip.", "error");
+    return;
+  }
+
   const targetDoc = allArchives.find((a) => a.id === id);
   if (!targetDoc) return;
 
@@ -276,8 +308,23 @@ export default function App() {
     }).length;
   };
 
+  // --- RBAC: arsip yang ditampilkan, difilter sesuai kategori yang boleh dilihat peran ---
+  // Catatan: saat ini hanya Notaris yang dibatasi kategori (Akta saja).
+  // Peran lain dengan izin "lihat_arsip" tetap melihat semua arsip.
+  const visibleArchives = allArchives.filter((a) => canAccessKategori(currentUser, a.kategori));
+
   // --- RENDER ROUTING MANAGER ---
   const renderPageLayout = () => {
+    // --- RBAC GUARD: pengecekan terakhir sebelum render, mencegah akses via state langsung ---
+    if (!canAccessPage(currentUser, currentPage)) {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 text-center gap-2">
+          <p className="text-[#0B1F3A] font-semibold">Akses Ditolak</p>
+          <p className="text-sm text-[#718096]">Anda tidak memiliki izin untuk membuka halaman ini.</p>
+        </div>
+      );
+    }
+
     switch (currentPage) {
       case "DASHBOARD":
         if (loadingArchives) {
@@ -285,10 +332,10 @@ export default function App() {
         }
         return (
           <Dashboard
-            archives={allArchives}
+            archives={visibleArchives}
             currentUser={currentUser!}
             onNavigate={handleNavigate}
-            retentionUrgentList={allArchives.filter((a) => {
+            retentionUrgentList={visibleArchives.filter((a) => {
               if (a.statusArsip === "Permanen") return false;
               const diff = (new Date(a.tanggalRetensi).getTime() - new Date("2026-06-08").getTime()) / (1000 * 3600 * 24);
               return diff <= 180;
@@ -299,7 +346,7 @@ export default function App() {
       case "DAFTAR_ARSIP":
         return (
           <ArchiveList
-            archives={allArchives}
+            archives={visibleArchives}
             currentUser={currentUser}
             onNavigate={handleNavigate}
             onUpdateArchives={handleUpdateArchivesList}
@@ -308,6 +355,15 @@ export default function App() {
         );
 
       case "TAMBAH_ARSIP":
+        // --- RBAC GUARD: Kepala Kantor tidak boleh tambah arsip ---
+        if (!can(currentUser, "tambah_arsip")) {
+          return (
+            <div className="flex flex-col items-center justify-center h-64 text-center gap-2">
+              <p className="text-[#0B1F3A] font-semibold">Akses Ditolak</p>
+              <p className="text-sm text-[#718096]">Peran Anda tidak dapat menambah arsip.</p>
+            </div>
+          );
+        }
         return (
           <ArchiveAddEdit
             mode="add"
@@ -319,7 +375,17 @@ export default function App() {
           />
         );
 
-      case "EDIT_ARSIP":
+      case "EDIT_ARSIP": {
+        // --- RBAC GUARD: cek kepemilikan + kategori sebelum render form edit ---
+        const targetArchive = allArchives.find((a) => a.id === activeArchiveId);
+        if (!targetArchive || !canEdit(currentUser, targetArchive)) {
+          return (
+            <div className="flex flex-col items-center justify-center h-64 text-center gap-2">
+              <p className="text-[#0B1F3A] font-semibold">Akses Ditolak</p>
+              <p className="text-sm text-[#718096]">Anda tidak memiliki izin untuk mengedit arsip ini.</p>
+            </div>
+          );
+        }
         return (
           <ArchiveAddEdit
             mode="edit"
@@ -331,12 +397,13 @@ export default function App() {
             systemConfig={systemConfig}
           />
         );
+      }
 
       case "DETAIL_ARSIP":
         return (
           <ArchiveDetail
             archiveId={activeArchiveId || ""}
-            archives={allArchives}
+            archives={visibleArchives}
             currentUser={currentUser}
             onNavigate={handleNavigate}
             onDelete={handleDeleteArchive}
@@ -346,7 +413,7 @@ export default function App() {
       case "PENCARIAN_ARSIP":
         return (
           <ArchiveSearch
-            archives={allArchives}
+            archives={visibleArchives}
             onNavigate={handleNavigate}
             recentSearches={recentSearches}
             onAddRecentSearch={handleAddRecentSearch}
@@ -354,12 +421,12 @@ export default function App() {
         );
 
       case "LAPORAN":
-        return <Reports archives={allArchives} />;
+        return <Reports archives={visibleArchives} />;
 
       case "ARSIP_MENDEKATI_RETENSI":
         return (
           <RetentionWarning
-            archives={allArchives}
+            archives={visibleArchives}
             currentUser={currentUser}
             onUpdateArchives={handleUpdateArchivesList}
             onNavigate={handleNavigate}
@@ -388,7 +455,7 @@ export default function App() {
         return <SystemSettings systemConfig={systemConfig} onUpdateConfig={setSystemConfig} />;
 
       default:
-        return <Dashboard archives={allArchives} currentUser={currentUser} onNavigate={handleNavigate} retentionUrgentList={[]} />;
+        return <Dashboard archives={visibleArchives} currentUser={currentUser} onNavigate={handleNavigate} retentionUrgentList={[]} />;
     }
   };
 
