@@ -284,15 +284,11 @@ export default function App() {
   if (!targetDoc) return;
 
   await supabase.from('arsip').delete().eq('data->>id', id);
-
-  console.log("targetDoc.fileDokumen:", targetDoc.fileDokumen);
     
   const fileName = targetDoc.fileDokumen?.url?.split("/dokumen-arsip/")[1];
-
-  console.log("fileName hasil split:", fileName);
-    
   if (fileName) {
-    await supabase.storage.from("dokumen-arsip").remove([fileName]);
+    const decodedFileName = decodeURIComponent(fileName);
+    await supabase.storage.from("dokumen-arsip").remove([decodedFileName]);
   }
 
 setAllArchives(prev => prev.filter((a) => a.id !== id));
