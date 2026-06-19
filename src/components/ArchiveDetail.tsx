@@ -46,9 +46,6 @@ export default function ArchiveDetail({
   
   const archive = archives.find(a => a.id === archiveId);
 
-  // Modal print view state
-  const [showPrintLabel, setShowPrintLabel] = useState(false);
-  
   // Gated Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
@@ -114,117 +111,190 @@ export default function ArchiveDetail({
   };
 
   const handlePrintTrigger = () => {
+    // Ambil SVG dari QRCodeSVG yang sudah dirender di DOM
     const qrSvgElement = document.querySelector("#physical-printable-tag svg");
     const qrSvgString = qrSvgElement ? qrSvgElement.outerHTML : "";
   
-    const printWindow = window.open('', '_blank', 'width=400,height=350');
-    if (!printWindow) return;
+    const printWindow = window.open("", "_blank", "width=900,height=700");
+    if (!printWindow) {
+      alert("Mohon izinkan pop-up untuk membuka label QR.");
+      return;
+    }
   
     printWindow.document.write(`
+      <!DOCTYPE html>
       <html>
         <head>
           <title>Label QR - ${archive.nomorArsip}</title>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { 
-              font-family: sans-serif; 
-              padding: 16px;
-              width: 320px;
+            body {
+              font-family: sans-serif;
+              background: #f5f5f5;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: flex-start;
+              min-height: 100vh;
+              padding: 40px 20px;
+              gap: 24px;
             }
+  
+            h1 {
+              font-size: 13px;
+              letter-spacing: 0.15em;
+              text-transform: uppercase;
+              color: #4a4a4a;
+              font-weight: 700;
+            }
+  
             .card {
-              border: 2px solid #111;
-              padding: 12px;
-              border-radius: 6px;
+              border: 2px solid #C89B3C;
+              padding: 20px;
+              border-radius: 10px;
               background: white;
+              width: 380px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             }
+  
             .header {
               display: flex;
               justify-content: space-between;
               align-items: center;
-              border-bottom: 1px solid #aaa;
-              padding-bottom: 6px;
-              margin-bottom: 8px;
+              border-bottom: 1px solid #ccc;
+              padding-bottom: 8px;
+              margin-bottom: 12px;
             }
+  
             .header-left {
-              font-size: 9px;
+              font-size: 10px;
               font-weight: bold;
               text-transform: uppercase;
-              letter-spacing: 0.05em;
+              letter-spacing: 0.08em;
+              color: #0B1F3A;
             }
+  
             .header-code {
               font-size: 8px;
               font-family: monospace;
-              background: #e2e2e2;
-              padding: 2px 4px;
-              border-radius: 3px;
+              background: #f0f0f0;
+              padding: 2px 6px;
+              border-radius: 4px;
+              color: #555;
             }
+  
             .body {
               display: flex;
-              gap: 10px;
+              gap: 14px;
             }
+  
             .qr-box {
-              background: #f5f5f5;
-              border: 1px solid #ccc;
-              padding: 4px;
-              border-radius: 4px;
+              background: white;
+              border: 1px solid #ddd;
+              padding: 6px;
+              border-radius: 6px;
               flex-shrink: 0;
             }
+  
             .info {
               flex: 1;
               display: flex;
               flex-direction: column;
-              gap: 4px;
+              gap: 6px;
             }
+  
             .label {
               font-size: 7.5px;
               text-transform: uppercase;
-              color: #555;
+              color: #888;
               font-weight: 700;
-              letter-spacing: 0.05em;
+              letter-spacing: 0.06em;
             }
+  
             .value {
-              font-size: 10px;
+              font-size: 11px;
               font-weight: bold;
               font-family: monospace;
-              color: #111;
-              line-height: 1.2;
+              color: #0B1F3A;
+              line-height: 1.3;
             }
+  
             .value-sm {
-              font-size: 8.5px;
+              font-size: 9px;
               font-weight: bold;
-              color: #111;
-              max-width: 160px;
+              color: #0B1F3A;
+              max-width: 180px;
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
             }
+  
             .grid-2 {
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 4px;
+              gap: 6px;
               margin-top: 4px;
             }
+  
             .footer {
-              border-top: 1px dashed #aaa;
-              padding-top: 5px;
-              margin-top: 8px;
+              border-top: 1px dashed #ccc;
+              padding-top: 8px;
+              margin-top: 12px;
               display: flex;
               justify-content: space-between;
-              font-size: 7px;
-              color: #666;
+              font-size: 7.5px;
+              color: #777;
               text-transform: uppercase;
               font-family: monospace;
               font-weight: bold;
             }
+  
+            .actions {
+              display: flex;
+              gap: 12px;
+              margin-top: 8px;
+            }
+  
+            button {
+              padding: 10px 28px;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: bold;
+              cursor: pointer;
+              border: none;
+              transition: opacity 0.2s;
+            }
+  
+            .btn-print {
+              background: #C89B3C;
+              color: white;
+            }
+  
+            .btn-print:hover { opacity: 0.85; }
+  
+            .btn-close {
+              background: #f0f0f0;
+              color: #333;
+            }
+  
+            .btn-close:hover { opacity: 0.75; }
+  
             @media print {
-              body { padding: 0; }
+              body {
+                background: white;
+                padding: 20px;
+              }
+              .actions { display: none; }
+              .card { box-shadow: none; border-color: #333; }
             }
           </style>
         </head>
         <body>
+          <h1>Label Tag Arsip Fisik SiNAR</h1>
+  
           <div class="card">
             <div class="header">
-              <span class="header-left">notariat utama sinar</span>
+              <span class="header-left">Notariat Utama Sinar</span>
               <span class="header-code">CODE: ${archive.id}</span>
             </div>
             <div class="body">
@@ -247,19 +317,21 @@ export default function ArchiveDetail({
                   </div>
                   <div>
                     <div class="label">Tanggal</div>
-                    <div class="value" style="font-size:8px">${archive.tanggalArsip}</div>
+                    <div class="value" style="font-size:9px">${archive.tanggalArsip}</div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="footer">
-              <span>sistem pengarsipan terstruktur</span>
-              <span>tgl retensi: ${archive.tanggalRetensi}</span>
+              <span>Sistem Pengarsipan Terstruktur</span>
+              <span>Tgl Retensi: ${archive.tanggalRetensi}</span>
             </div>
           </div>
-          <script>
-            window.onload = function() { window.print(); window.close(); }
-          </script>
+  
+          <div class="actions">
+            <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+            <button class="btn-close" onclick="window.close()">✕ Tutup</button>
+          </div>
         </body>
       </html>
     `);
@@ -307,7 +379,7 @@ export default function ArchiveDetail({
         <div className="flex flex-wrap items-center gap-2">
           {/* Print Label tag */}
           <button
-            onClick={() => setShowPrintLabel(true)}
+            onClick={handlePrintTrigger}
             className="px-3 py-2 text-xs font-bold bg-[#FAFAF8] hover:bg-[#FDF8F0] hover:text-[#C89B3C] text-[#0B1F3A] rounded-lg border border-[#D4B896] hover:border-[#C89B3C] transition cursor-pointer flex items-center gap-1.5"
           >
             <Printer className="w-4 h-4" /> Cetak Label QR
@@ -790,72 +862,6 @@ export default function ArchiveDetail({
         </div>
 
       </div>
-
-      {/* --- PRINTABLE PHYSICAL NOTARY LABEL (Modal printable layout) --- */}
-      {showPrintLabel && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-bg/85 backdrop-blur-sm no-print">
-          <div className="bg-white text-navy-bg w-full max-w-sm rounded-lg p-6 border-2 border-gold-royal relative">
-            <h3 className="text-sm font-bold border-b border-slate-300 pb-2 mb-4 uppercase tracking-widest text-slate-500">Label Tag Arsip Fisik SiNAR</h3>
-            
-            {/* Tag Printable Layout Area */}
-            <div id="physical-printable-tag" className="border-2 border-slate-900 p-4 rounded bg-white text-slate-900 font-sans space-y-3 shadow-inner">
-              <div className="flex items-center justify-between border-b border-slate-400 pb-2 mb-2 text-slate-900">
-                <span className="text-[10px] font-bold tracking-widest uppercase font-sans">notariat utama sinar</span>
-                <span className="text-[9px] font-mono bg-slate-200 px-1 rounded block">CODE: {archive.id}</span>
-              </div>
-
-              <div className="flex gap-3">
-                <div className="bg-slate-100 p-1 rounded inline-block border border-slate-300">
-                  <QRCodeSVG 
-                    value={window.location.origin + "/?archive=" + archive.id}
-                    size={80}
-                    bgColor="#FFFFFF"
-                    fgColor="#000000"
-                  />
-                </div>
-                <div className="space-y-1 font-sans flex-1 text-slate-900 leading-tight">
-                  <span className="text-[9px] font-mono text-slate-500 uppercase block tracking-wider font-semibold">Nomor Arsip:</span>
-                  <span className="text-[11px] font-bold font-mono tracking-tight block text-slate-900">{archive.nomorArsip}</span>
-                  
-                  <span className="text-[9px] font-mono text-slate-500 uppercase block tracking-wider font-semibold mt-1.5">Judul Akta:</span>
-                  <span className="text-xs font-bold leading-none block truncate max-w-[170px] text-slate-900">{archive.judulArsip}</span>
-                  
-                  <div className="grid grid-cols-2 gap-1.5 pt-1.5 font-sans">
-                    <div>
-                      <span className="text-[7px] text-slate-500 font-bold uppercase block">Kategori</span>
-                      <span className="text-[9px] font-bold block italic truncate capitalize">{archive.kategori}</span>
-                    </div>
-                    <div>
-                      <span className="text-[7px] text-slate-500 font-bold uppercase block">Tanggal</span>
-                      <span className="text-[9px] font-bold block font-mono">{archive.tanggalArsip}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-dashed border-slate-400 flex items-center justify-between text-[7px] text-slate-500 uppercase font-mono font-bold leading-none">
-                <span>sistem pengarsipan terstruktur</span>
-                <span>tgl retensi: {archive.tanggalRetensi}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-2.5 mt-5">
-              <button
-                onClick={() => setShowPrintLabel(false)}
-                className="flex-1 px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded cursor-pointer"
-              >
-                Tutup
-              </button>
-              <button
-                onClick={handlePrintTrigger}
-                className="flex-1 px-3 py-2 text-xs bg-gold-royal text-navy-bg hover:bg-gold-dark hover:text-white font-bold rounded flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Printer className="w-3.5 h-3.5" /> Cetak Sekarang
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* --- GATED DELETE SECURITY DIALOG (Admin Gated Modal) --- */}
       {showDeleteModal && (
