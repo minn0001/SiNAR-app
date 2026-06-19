@@ -72,10 +72,6 @@ export default function ArchiveAddEdit({
   const [unitPengolah, setUnitPengolah] = useState("Divisi PPAT");
   const [keterangan, setKeterangan] = useState("");
   const [lokasiFisik, setLokasiFisik] = useState("");
-  
-  // Tag fields
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState("");
 
   // File Upload states (mocked with realistic metadata)
   const [uploadedFile, setUploadedFile] = useState<{
@@ -104,7 +100,6 @@ export default function ArchiveAddEdit({
       setUnitPengolah(existingArchive.unitPengolah);
       setKeterangan(existingArchive.keterangan);
       setLokasiFisik(existingArchive.lokasiFisik || "");
-      setTags(existingArchive.tags);
       setUploadedFile({
         filename: existingArchive.fileDokumen.filename,
         size: existingArchive.fileDokumen.size,
@@ -126,7 +121,6 @@ export default function ArchiveAddEdit({
       setUnitPengolah("Divisi PPAT");
       setKeterangan("");
       setLokasiFisik("");
-      setTags([]);
       setUploadedFile(null);
     }
     setFormErrors({});
@@ -185,19 +179,6 @@ export default function ArchiveAddEdit({
       setNomorArsip(generated);
     }
   }, [tanggalArsip, kategori, mode, archives.length, systemConfig.nomorFormat]);
-
-  // TAG OPERATIONS
-  const handleAddTag = () => {
-    const trimmed = tagInput.trim();
-    if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed]);
-      setTagInput("");
-    }
-  };
-
-  const handleRemoveTag = (index: number) => {
-    setTags(tags.filter((_, idx) => idx !== index));
-  };
 
   // HANDLE MOCK FILE UPLOAD
   const handleFileSelect = async (targetFiles: FileList | null) => {
@@ -272,6 +253,7 @@ export default function ArchiveAddEdit({
     if (!judulArsip.trim()) errors.judul = "Judul arsip wajib diisi.";
     if (!nomorArsip.trim()) errors.nomor = "Nomor urut arsip wajib diisi.";
     if (!tanggalArsip) errors.tanggal = "Pilih tanggal pengesahan arsip.";
+    if (!lokasiFisik.trim()) errors.lokasi = "Lokasi fisik penyimpanan wajib diisi.";
     if (!uploadedFile) errors.file = "Unggah berkas dokumen utama (PDF/JPG) berkas.";
 
     if (Object.keys(errors).length > 0) {
@@ -334,7 +316,6 @@ export default function ArchiveAddEdit({
       statusArsip,
       masaRetensi,
       tanggalRetensi,
-      tags,
       namaKlien: namaKlien.trim() || "Nihil / Umum",
       unitPengolah,
       keterangan: keterangan.trim() || "Tanpa rincian tambahan.",
@@ -535,14 +516,15 @@ export default function ArchiveAddEdit({
             
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#718096] uppercase tracking-widest block">
-                  Lokasi Fisik
+                  Lokasi Fisik <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
+                  required
                   placeholder="L1-R3-B12"
                   value={lokasiFisik}
                   onChange={(e) => setLokasiFisik(e.target.value.toUpperCase())}
-                  className="w-full bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] font-mono placeholder-[#A0AEC0]"
+                  className="..."
                 />
                 <span className="text-[9px] text-[#718096] leading-none block">Format: Lemari-Rak-Box</span>
               </div>
@@ -670,54 +652,6 @@ export default function ArchiveAddEdit({
                 </strong>. Sesudah tanggal tersebut, status akan berubah otomatis ke Inaktif/Pemusnahan.
               </div>
             </div>
-          </div>
-
-          {/* DYNAMIC TAG INPUT FIELD */}
-          <div className="bg-white p-6 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] space-y-3">
-            <h4 className="text-xs font-bold text-[#718096] uppercase tracking-widest block font-display">
-              Label / Kata Kunci (Tag)
-            </h4>
-
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="cth: tanah"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
-                className="flex-1 bg-white border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg p-2 text-xs text-[#0B1F3A]"
-              />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                className="bg-gold-royal text-white hover:bg-gold-dark transition p-2 px-3 rounded-lg text-xs font-bold cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Render selected tags list */}
-            {tags.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5 pt-1.5">
-                {tags.map((tg, idx) => (
-                  <span 
-                    key={idx} 
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F5E6C8] border border-[#C89B3C]/30 text-[10px] text-gold-dark font-semibold capitalize font-mono"
-                  >
-                    {tg}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTag(idx)}
-                      className="text-red-500 hover:text-red-700 font-bold ml-0.5 scale-90"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <span className="text-[10px] text-[#718096] italic block pt-1">Belum ada label disematkan. Klik Enter untuk menambah label.</span>
-            )}
           </div>
 
           {/* SUBMIT FORM BUTTONS ACTIONS */}
