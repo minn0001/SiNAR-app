@@ -261,7 +261,7 @@ export default function App() {
     setAllArchives(prev => prev.map((a) => (a.id === archive.id ? archive : a)));
     appendAuditLog("Edit Arsip", archive.nomorArsip, currentUser);
   }
-  showToast("Dokumen berhasil disimpan.");
+  showToast("Dokumen berhasil disimpan");
   handleNavigate("DAFTAR_ARSIP");
 };
   
