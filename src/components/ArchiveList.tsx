@@ -26,6 +26,7 @@ import {
   Printer
 } from "lucide-react";
 import { Archive, KategoriArsip, StatusArsip, User, UserRole } from "../types";
+import { canEdit } from "../lib/permissions";
 
 interface ArchiveListProps {
   archives: Archive[];
@@ -631,10 +632,8 @@ export default function ArchiveList({
                           {currentUser.role !== UserRole.KEPALA_KANTOR && (
                             <button
                               onClick={() => {
-                                // "Notaris: Full access to Akta, View-only for other categories"
-                                if (currentUser.role === UserRole.NOTARIS && 
-                                    ![KategoriArsip.AKTA_JUAL_BELI, KategoriArsip.AKTA_PENDIRIAN_PERUSAHAAN].includes(archive.kategori)) {
-                                  alert("Akses edit ditolak. Notaris hanya memiliki kewenangan edit untuk kategori Akta.");
+                                if (!canEdit(currentUser, archive)) {
+                                  alert("Akses edit ditolak.");
                                   return;
                                 }
                                 onNavigate("EDIT_ARSIP", archive.id);
