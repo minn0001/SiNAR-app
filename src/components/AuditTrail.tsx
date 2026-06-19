@@ -74,55 +74,58 @@ export default function AuditTrail({
     const pageH = 210;
     const margin = 14;
     const contentW = pageW - margin * 2;
-  
-    // ── Header navy ──
-    doc.setFillColor(11, 31, 58);
-    doc.rect(0, 0, pageW, 28, "F");
-  
-    doc.setTextColor(200, 155, 60);
-    doc.setFontSize(13);
-    doc.setFont("helvetica", "bold");
-    doc.text("KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn.", margin, 11);
-  
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text("Jl. Sudirman No. 45, Jakarta Selatan  |  Telp. (021) 5551234  |  notaris.rinamaharani@gmail.com", margin, 17);
-  
-    // Garis gold di bawah alamat
-    doc.setDrawColor(200, 155, 60);
-    doc.setLineWidth(0.5);
-    doc.line(margin, 22, pageW - margin, 22);
-  
-    doc.setTextColor(200, 155, 60);
-    doc.setFontSize(7);
-    doc.text("SiNAR – Sistem Arsip Digital", margin, 26);
-  
-    // ── Judul ──
-    doc.setTextColor(11, 31, 58);
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("LOG RIWAYAT AUDIT TRAIL", pageW / 2, 38, { align: "center" });
-  
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text("Perekaman menyeluruh kegiatan akses dokumen, login operator, dan sirkulasi draf notarisan", pageW / 2, 44, { align: "center" });
-  
-    const tanggalCetak = new Date().toLocaleDateString("id-ID", {
-      weekday: "long", year: "numeric", month: "long", day: "numeric"
-    });
-    doc.setFontSize(7);
-    doc.text(`Dicetak pada: ${tanggalCetak}`, pageW / 2, 49, { align: "center" });
-  
-    // Garis pembatas bawah "dicetak pada"
-    doc.setDrawColor(232, 220, 200);
-    doc.setLineWidth(0.3);
-    doc.line(margin, 52, pageW - margin, 52);
-  
-    // ── Tabel pakai drawTable sama persis seperti Reports ──
-    const headers = ["Waktu (WIB)", "Operator", "Peran", "Tindakan", "Target", "IP Address", "Perangkat"];
     const colWidths = [32, 38, 28, 28, 68, 30, 45];
+    const totalColW = colWidths.reduce((a, b) => a + b, 0);
+    const rowH = 8;
+  
+    const drawHeader = () => {
+      doc.setFillColor(11, 31, 58);
+      doc.rect(0, 0, pageW, 28, "F");
+  
+      doc.setTextColor(200, 155, 60);
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.text("KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn.", margin, 11);
+  
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text("Jl. Sudirman No. 45, Jakarta Selatan  |  Telp. (021) 5551234  |  notaris.rinamaharani@gmail.com", margin, 17);
+  
+      doc.setDrawColor(200, 155, 60);
+      doc.setLineWidth(0.5);
+      doc.line(margin, 22, pageW - margin, 22);
+  
+      doc.setTextColor(200, 155, 60);
+      doc.setFontSize(7);
+      doc.text("SiNAR – Sistem Arsip Digital", margin, 26);
+    };
+  
+    const drawPageFooter = (pageNum: number, totalPages: number) => {
+      doc.setDrawColor(232, 220, 200);
+      doc.setLineWidth(0.3);
+      doc.line(margin, pageH - 11, pageW - margin, pageH - 11);
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.setFont("helvetica", "normal");
+      doc.text("Dicetak otomatis oleh SiNAR – Sistem Arsip Digital Kantor Notaris & PPAT Rina Maharani, S.H., M.Kn.", margin, pageH - 7);
+      doc.text(`Hal. ${pageNum} / ${totalPages}`, pageW - margin, pageH - 7, { align: "right" });
+    };
+  
+    const drawTableHeader = (startY: number) => {
+      const headers = ["Waktu (WIB)", "Operator", "Peran", "Tindakan", "Target", "IP Address", "Perangkat"];
+      doc.setFillColor(245, 230, 200);
+      doc.rect(margin, startY, totalColW, rowH, "F");
+      doc.setTextColor(11, 31, 58);
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "bold");
+      let x = margin;
+      headers.forEach((h, i) => {
+        doc.text(h, x + 3, startY + 5.5);
+        x += colWidths[i];
+      });
+    };
+  
     const rows = filteredLogs.map((log) => [
       log.timestamp,
       log.userName.split(",")[0],
@@ -133,64 +136,106 @@ export default function AuditTrail({
       log.device
     ]);
   
-    const rowH = 8;
-    let startY = 57;
+    // Hitung total halaman
+    const firstPageRows = Math.floor((pageH - 75) / rowH); // halaman pertama lebih pendek (ada judul)
+    const otherPageRows = Math.floor((pageH - 45) / rowH); // halaman berikutnya
+    let totalPages = 1;
+    if (rows.length > firstPageRows) {
+      totalPages += Math.ceil((rows.length - firstPageRows) / otherPageRows);
+    }
   
-    // Header row
-    doc.setFillColor(245, 230, 200);
-    doc.rect(margin, startY, colWidths.reduce((a, b) => a + b, 0), rowH, "F");
-    doc.setTextColor(11, 31, 58);
-    doc.setFontSize(7.5);
-    doc.setFont("helvetica", "bold");
+    // ── Halaman pertama ──
+    drawHeader();
   
-    let x = margin;
-    headers.forEach((h, i) => {
-      doc.text(h, x + 3, startY + 5.5);
-      x += colWidths[i];
+    const tanggalCetak = new Date().toLocaleDateString("id-ID", {
+      weekday: "long", year: "numeric", month: "long", day: "numeric"
     });
   
-    // Data rows
+    doc.setTextColor(11, 31, 58);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("LOG RIWAYAT AUDIT TRAIL", pageW / 2, 38, { align: "center" });
+  
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Perekaman menyeluruh kegiatan akses dokumen, login operator, dan sirkulasi draf notarisan", pageW / 2, 44, { align: "center" });
+  
+    doc.setFontSize(7);
+    doc.text(`Dicetak pada: ${tanggalCetak}`, pageW / 2, 49, { align: "center" });
+  
+    doc.setDrawColor(232, 220, 200);
+    doc.setLineWidth(0.3);
+    doc.line(margin, 52, pageW - margin, 52);
+  
+    let currentY = 56;
+    drawTableHeader(currentY);
+    currentY += rowH;
+  
+    let pageNum = 1;
+    let rowsOnThisPage = 0;
+    const maxRowsFirstPage = firstPageRows;
+    const maxRowsOtherPage = otherPageRows;
+  
     rows.forEach((row, rIdx) => {
-      const y = startY + rowH * (rIdx + 1);
+      const maxRows = pageNum === 1 ? maxRowsFirstPage : maxRowsOtherPage;
   
-      // Cek kalau melebihi halaman
-      if (y + rowH > pageH - 20) return;
+      if (rowsOnThisPage >= maxRows) {
+        // Border luar tabel halaman ini
+        doc.setDrawColor(200, 155, 60);
+        doc.setLineWidth(0.4);
+        doc.rect(margin, currentY - rowH * rowsOnThisPage - rowH, totalColW, rowH * (rowsOnThisPage + 1), "S");
   
+        drawPageFooter(pageNum, totalPages);
+        doc.addPage();
+        pageNum++;
+        rowsOnThisPage = 0;
+  
+        drawHeader();
+        currentY = 36;
+        drawTableHeader(currentY);
+        currentY += rowH;
+      }
+  
+      // Alternating row background
       doc.setFillColor(rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 248 : 255);
-      doc.rect(margin, y, colWidths.reduce((a, b) => a + b, 0), rowH, "F");
+      doc.rect(margin, currentY, totalColW, rowH, "F");
   
-      // Garis bawah tiap row (sekat)
+      // Garis bawah row
       doc.setDrawColor(232, 220, 200);
       doc.setLineWidth(0.2);
-      doc.line(margin, y + rowH, margin + colWidths.reduce((a, b) => a + b, 0), y + rowH);
+      doc.line(margin, currentY + rowH, margin + totalColW, currentY + rowH);
   
-      // Garis vertikal antar kolom
+      // Garis vertikal kolom
       let cx2 = margin;
       colWidths.forEach((w) => {
-        doc.line(cx2, y, cx2, y + rowH);
+        doc.line(cx2, currentY, cx2, currentY + rowH);
         cx2 += w;
       });
-      doc.line(cx2, y, cx2, y + rowH);
+      doc.line(cx2, currentY, cx2, currentY + rowH);
   
+      // Teks
       doc.setFont("helvetica", "normal");
       doc.setTextColor(74, 85, 104);
       doc.setFontSize(7.5);
-  
       let cx = margin;
       row.forEach((cell, i) => {
-        doc.text(String(cell), cx + 3, y + 5.5);
+        doc.text(String(cell), cx + 3, currentY + 5.5);
         cx += colWidths[i];
       });
+  
+      currentY += rowH;
+      rowsOnThisPage++;
     });
   
-    // Border luar gold
-    const tableH = rowH * (Math.min(rows.length, Math.floor((pageH - 20 - startY - rowH) / rowH)) + 1);
+    // Border luar tabel halaman terakhir
     doc.setDrawColor(200, 155, 60);
     doc.setLineWidth(0.4);
-    doc.rect(margin, startY, colWidths.reduce((a, b) => a + b, 0), tableH, "S");
+    const tableStartY = currentY - rowH * rowsOnThisPage - rowH;
+    doc.rect(margin, tableStartY, totalColW, rowH * (rowsOnThisPage + 1), "S");
   
-    // Footer total
-    const finalY = startY + tableH + 8;
+    // Total box
+    const finalY = currentY + 5;
     doc.setFillColor(253, 248, 240);
     doc.setDrawColor(200, 155, 60);
     doc.roundedRect(margin, finalY, contentW, 12, 2, 2, "FD");
@@ -199,15 +244,7 @@ export default function AuditTrail({
     doc.setFont("helvetica", "bold");
     doc.text(`TOTAL KESELURUHAN LOG: ${filteredLogs.length} entri`, margin + 5, finalY + 8);
   
-    // Footer halaman
-    doc.setDrawColor(232, 220, 200);
-    doc.setLineWidth(0.3);
-    doc.line(margin, pageH - 14 - 3, pageW - margin, pageH - 14 - 3);
-    doc.setFontSize(7);
-    doc.setTextColor(150, 150, 150);
-    doc.setFont("helvetica", "normal");
-    doc.text("Dicetak otomatis oleh SiNAR – Sistem Arsip Digital Kantor Notaris & PPAT Rina Maharani, S.H., M.Kn.", margin, pageH - 14);
-    doc.text("Hal. 1", pageW - margin, pageH - 14, { align: "right" });
+    drawPageFooter(pageNum, totalPages);
   
     doc.save(`AuditTrail_SiNAR_${new Date().toISOString().split("T")[0]}.pdf`);
   };
