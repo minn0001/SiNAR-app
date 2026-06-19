@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Archive, KategoriArsip, StatusArsip, User, UserRole } from "../types";
+import { canEdit as checkCanEdit } from "../lib/permissions";
 
 interface ArchiveDetailProps {
   archiveId: string;
@@ -69,9 +70,7 @@ export default function ArchiveDetail({
   
   // Can current user edit this archive?
   // Notaris can edit Akta category archives, Staff can edit what they manage
-  const canEdit = currentUser.role === UserRole.ADMIN || 
-    (currentUser.role === UserRole.NOTARIS && [KategoriArsip.AKTA_JUAL_BELI, KategoriArsip.AKTA_PENDIRIAN_PERUSAHAAN].includes(archive.kategori)) ||
-    currentUser.role === UserRole.STAFF; // Staff/Notaris view edit button
+  const canEdit = checkCanEdit(currentUser, archive);
 
   // Status Badge Themes
   const getStatusBadge = (status: StatusArsip) => {
