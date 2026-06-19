@@ -165,7 +165,8 @@ export default function ArchiveAddEdit({
       else if (kategori === KategoriArsip.AKTA_PENDIRIAN_PERUSAHAAN) categoryCode = "AKTA-APP";
       else if (kategori === KategoriArsip.SURAT_KUASA) categoryCode = "SK";
       else if (kategori === KategoriArsip.PERJANJIAN) categoryCode = "PERJ";
-      else if (kategori === KategoriArsip.SERTIFIKAT) categoryCode = "SERT-XLL";
+      else if (kategori === KategoriArsip.SERTIFIKAT) categoryCode = "SERT";
+      else if (kategori === KategoriArsip.DOKUMEN_PENDUKUNG) categoryCode = "DPEND";
   
       const countOfCategory = archives.filter(a => a.kategori === kategori).length + 1;
       const serial = String(countOfCategory).padStart(2, "0");
