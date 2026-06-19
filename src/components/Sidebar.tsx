@@ -23,6 +23,9 @@ import {
 } from "lucide-react";
 import { User, UserRole } from "../types";
 
+// --- RBAC IMPORT: satu sumber kebenaran untuk semua aturan akses ---
+import { canAccessPage, can } from "../lib/permissions";
+
 interface NavigationProps {
   currentPage: string;
   setCurrentPage: (page: string) => void;
@@ -41,16 +44,14 @@ export default function Sidebar({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Helper to check if a page is accessible by the current user's role
+  // --- RBAC: ganti hardcode role check dengan permissions.ts ---
+  // "TAMBAH_ARSIP" bukan page-permission map biasa (lihat lib/permissions.ts),
+  // jadi dicek terpisah pakai can("tambah_arsip").
   const canAccess = (page: string): boolean => {
-    const role = currentUser.role;
-    if (page === "AUDIT_TRAIL" || page === "KELOLA_PENGGUNA" || page === "PENGATURAN_SISTEM") {
-      return role === UserRole.ADMIN;
-    }
     if (page === "TAMBAH_ARSIP") {
-      return role !== UserRole.KEPALA_KANTOR;
+      return can(currentUser, "tambah_arsip");
     }
-    return true; // All can access Dashboard, List, Search, Reports, Retention
+    return canAccessPage(currentUser, page);
   };
 
   const navItems = [
@@ -307,9 +308,9 @@ export default function Sidebar({
         {[
           { id: "DASHBOARD", label: "Dashboard", icon: LayoutDashboard },
           { id: "DAFTAR_ARSIP", label: "Arsip", icon: FolderLock },
-          { id: "TAMBAH_ARSIP", label: "Tambah", icon: PlusCircle, disabled: currentUser.role === UserRole.KEPALA_KANTOR },
+          { id: "TAMBAH_ARSIP", label: "Tambah", icon: PlusCircle, disabled: !canAccess("TAMBAH_ARSIP") },
           { id: "PENCARIAN_ARSIP", label: "Cari", icon: Search },
-          { id: "ARSIP_MENDEKATI_RETENSI", label: "Retensi", icon: AlertTriangle, badge: retentionWarningCount > 0 ? retentionWarningCount : undefined }
+          { id: "ARSIP_MENDEKATI_RETENSI", label: "Retensi", icon: AlertTriangle, disabled: !canAccess("ARSIP_MENDEKATI_RETENSI"), badge: retentionWarningCount > 0 ? retentionWarningCount : undefined }
         ]
         .filter(item => !item.disabled)
         .map((item) => {
@@ -337,8 +338,8 @@ export default function Sidebar({
           );
         })}
 
-        {/* If Admin, we allow navigating to system/users through a quick popover or tab switch */}
-        {currentUser.role === UserRole.ADMIN && (
+        {/* Jika Admin, izinkan navigasi ke halaman administratif lewat tombol siklus */}
+        {can(currentUser, "kelola_pengguna") && (
           <button
             onClick={() => {
               // Cyclically switches between administrative pages
