@@ -53,7 +53,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   [UserRole.NOTARIS]: [
     "lihat_arsip",       // tapi dibatasi kategori Akta saja (lihat canAccessKategori)
     "tambah_arsip",      // kategori Akta saja
-    "edit_arsip_sendiri", // kategori Akta saja
+    "edit_arsip_semua", // kategori Akta saja
     "lihat_laporan",     // laporan Akta saja
   ],
 
@@ -120,19 +120,17 @@ export function canEdit(
 ): boolean {
   if (!user) return false;
 
-  // Admin bisa edit semua
-  if (can(user, "edit_arsip_semua")) return true;
+  // Admin: edit semua tanpa batas
+  if (can(user, "edit_arsip_semua") && user.role === UserRole.ADMIN) return true;
 
-  // Staff & Notaris: hanya arsip milik sendiri
+  // Notaris: edit semua arsip tapi hanya kategori Akta
+  if (user.role === UserRole.NOTARIS) {
+    return canAccessKategori(user, archive.kategori);
+  }
+
+  // Staff: hanya arsip buatan sendiri
   if (can(user, "edit_arsip_sendiri")) {
-    const isOwner = archive.createdBy === user.id;
-    if (!isOwner) return false;
-
-    // Notaris: tambahan filter kategori
-    if (user.role === UserRole.NOTARIS) {
-      return canAccessKategori(user, archive.kategori);
-    }
-    return true;
+    return archive.createdBy === user.id;
   }
 
   return false;
