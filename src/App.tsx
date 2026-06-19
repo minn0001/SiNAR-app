@@ -2,10 +2,10 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
- 
+
 import React, { useState, useEffect } from "react";
 import { createClient } from '@supabase/supabase-js';
- 
+
 const supabase = createClient(
   'https://mdcoxcwtgveczzvbjwzx.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kY294Y3d0Z3ZlY3p6dmJqd3p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDE4MTQsImV4cCI6MjA5NjcxNzgxNH0.CsfMpWulQPrizMRyzZVleSC17nIHtZVO2Ru_8H7kQgs'
@@ -23,16 +23,16 @@ import AuditTrail from "./components/AuditTrail";
 import UserManagement from "./components/UserManagement";
 import SystemSettings from "./components/SystemSettings";
 import SessionTimeoutModal from "./components/SessionTimeoutModal";
- 
+
 import { mockUsers, mockArchives, mockAuditLogs, defaultSystemConfig } from "./mockData";
 import { Archive, User, AuditLog, SystemConfig } from "./types";
- 
+
 // --- RBAC IMPORTS ---
 import { can, canAccessPage, canAccessKategori, canEdit } from "./lib/permissions";
- 
+
 const SESSION_LIMIT = 30 * 60; // 30 minutes in seconds
 const WARNING_LIMIT = 5 * 60; // 5 minutes in seconds
- 
+
 export default function App() {
   // --- CORE SYSTEM STATE ---
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -50,14 +50,14 @@ export default function App() {
   setToast({ message, type });
   setTimeout(() => setToast(null), 3000);
 };
- 
+
   // Baca archive ID dari URL saat pertama kali load
   const getArchiveIdFromUrl = () => {
     const params = new URLSearchParams(window.location.search);
     return params.get('archive');
   };
   const [pendingArchiveFromUrl] = useState(getArchiveIdFromUrl);
- 
+
   useEffect(() => {
   const loadArchives = async () => {
     const { data, error } = await supabase
@@ -74,7 +74,7 @@ export default function App() {
   };
   loadArchives();
 }, []);
- 
+
   useEffect(() => {
     const loadAuditLogs = async () => {
       const { data, error } = await supabase
@@ -102,11 +102,11 @@ export default function App() {
   // --- SESSION TIMER STATE ---
   const [secondsRemaining, setSecondsRemaining] = useState<number>(SESSION_LIMIT);
   const [showTimeoutModal, setShowTimeoutModal] = useState<boolean>(false);
- 
+
   // Countdown effect
   useEffect(() => {
     if (!currentUser) return;
- 
+
     const interval = setInterval(() => {
       setSecondsRemaining((prev) => {
         if (prev <= 1) {
@@ -114,19 +114,19 @@ export default function App() {
           handleSessionForceLogout();
           return 0;
         }
- 
+
         // Show timeout warning when less than 5 minutes remain (25 minutes elapsed)
         if (prev - 1 === WARNING_LIMIT) {
           setShowTimeoutModal(true);
         }
- 
+
         return prev - 1;
       });
     }, 1000);
- 
+
     return () => clearInterval(interval);
   }, [currentUser]);
- 
+
   // Reset timer on user interaction
   const resetActivityTimer = () => {
     if (currentUser) {
@@ -134,9 +134,9 @@ export default function App() {
       setShowTimeoutModal(false);
     }
   };
- 
+
   // --- MUTATION EVENTS & ACTIONS ---
- 
+
   const handleLoginSuccess = async (user: User) => {
     const now = new Date().toLocaleString("id-ID", {
     timeZone: "Asia/Jakarta",
@@ -147,7 +147,7 @@ export default function App() {
     hour: "2-digit",
     minute: "2-digit"
   });
- 
+
   const userWithLoginTime: User = {
     ...user,
     lastLogin: now + " WIB"
@@ -169,7 +169,7 @@ export default function App() {
       setAllAuditLogs(data.map((row: any) => row.data));
     }
   };
- 
+
   const handleLogout = () => {
     if (currentUser) {
       appendAuditLog("Logout", "Sistem", currentUser);
@@ -178,19 +178,19 @@ export default function App() {
     setCurrentPage("LOGIN");
     setActiveArchiveId(null);
   };
- 
+
   const handleSessionForceLogout = () => {
     alert("Sesi Anda telah berakhir secara otomatis karena tidak ada aktivitas selama 30 menit demi alasan keamanan.");
     setCurrentUser(null);
     setCurrentPage("LOGIN");
     setActiveArchiveId(null);
   };
- 
+
   const handleExtendSession = () => {
     setSecondsRemaining(SESSION_LIMIT);
     setShowTimeoutModal(false);
   };
- 
+
   // Appends security logs to audit history
   const appendAuditLog = async (action: string, target: string, actor: User) => {
     const freshLog: AuditLog = {
@@ -207,31 +207,31 @@ export default function App() {
     setAllAuditLogs((prev) => [freshLog, ...prev]);
     await supabase.from('audit_log').insert({ data: freshLog });
   };
- 
+
   // Navigates and triggers soft updates
   // --- RBAC GUARD: cek izin halaman sebelum navigasi ---
   const handleNavigate = (page: string, activeId: string | null = null) => {
     resetActivityTimer();
- 
+
     // Halaman LOGIN selalu boleh diakses
     if (page !== "LOGIN" && !canAccessPage(currentUser, page)) {
       showToast("Anda tidak memiliki akses ke halaman ini.", "error");
       return; // batalkan navigasi, tetap di halaman semula
     }
- 
+
     setCurrentPage(page);
     if (activeId !== null) {
       setActiveArchiveId(activeId);
     }
   };
- 
+
   // Archive edits or creation saves
   // --- RBAC GUARD: cek izin tambah/edit sebelum simpan ---
   const handleSaveArchive = async (archive: Archive) => {
   if (!currentUser) return;
- 
+
   const isNew = !allArchives.find((a) => a.id === archive.id);
- 
+
   if (isNew) {
     if (!can(currentUser, "tambah_arsip")) {
       showToast("Anda tidak memiliki izin untuk menambah arsip.", "error");
@@ -262,20 +262,20 @@ export default function App() {
   const handleUpdateArchivesList = (updated: Archive[]) => {
     setAllArchives(updated);
   };
- 
+
   // Delete gate action
   // --- RBAC GUARD: hanya Admin yang boleh hapus ---
   const handleDeleteArchive = async (id: string) => {
   if (!currentUser) return;
- 
+
   if (!can(currentUser, "hapus_arsip")) {
     showToast("Hanya Admin yang dapat menghapus arsip.", "error");
     return;
   }
- 
+
   const targetDoc = allArchives.find((a) => a.id === id);
   if (!targetDoc) return;
- 
+
   await supabase.from('arsip').delete().eq('data->>id', id);
   setAllArchives(prev => prev.filter((a) => a.id !== id));
   appendAuditLog("Hapus Arsip", `${targetDoc.nomorArsip} (${targetDoc.judulArsip})`, currentUser);
@@ -283,16 +283,16 @@ export default function App() {
   alert(`Arsip ${targetDoc.judulArsip} berhasil dihapus permanen secara aman.`);
   handleNavigate("DAFTAR_ARSIP");
 };
- 
+
   const handleUpdateUsers = (freshUsers: User[]) => {
     setAllUsers(freshUsers);
   };
- 
+
   const handleAddRecentSearch = (query: string) => {
     if (!query || recentSearches.includes(query)) return;
     setRecentSearches((prev) => [query, ...prev.slice(0, 4)]);
   };
- 
+
   // Calculate the sidebar notification badge count (Archives nearing retention/overdue within 180 days)
   const calculateRetentionAlertCount = (): number => {
     const todayMs = new Date("2026-06-08").getTime();
@@ -307,12 +307,12 @@ export default function App() {
       }
     }).length;
   };
- 
+
   // --- RBAC: arsip yang ditampilkan, difilter sesuai kategori yang boleh dilihat peran ---
   // Catatan: saat ini hanya Notaris yang dibatasi kategori (Akta saja).
   // Peran lain dengan izin "lihat_arsip" tetap melihat semua arsip.
   const visibleArchives = allArchives.filter((a) => canAccessKategori(currentUser, a.kategori));
- 
+
   // --- RENDER ROUTING MANAGER ---
   const renderPageLayout = () => {
     // --- RBAC GUARD: pengecekan terakhir sebelum render, mencegah akses via state langsung ---
@@ -324,7 +324,7 @@ export default function App() {
         </div>
       );
     }
- 
+
     switch (currentPage) {
       case "DASHBOARD":
         if (loadingArchives) {
@@ -342,7 +342,7 @@ export default function App() {
             })}
           />
         );
- 
+
       case "DAFTAR_ARSIP":
         return (
           <ArchiveList
@@ -353,7 +353,7 @@ export default function App() {
             onDeleteArchive={handleDeleteArchive}
           />
         );
- 
+
       case "TAMBAH_ARSIP":
         // --- RBAC GUARD: Kepala Kantor tidak boleh tambah arsip ---
         if (!can(currentUser, "tambah_arsip")) {
@@ -374,7 +374,7 @@ export default function App() {
             systemConfig={systemConfig}
           />
         );
- 
+
       case "EDIT_ARSIP": {
         // --- RBAC GUARD: cek kepemilikan + kategori sebelum render form edit ---
         const targetArchive = allArchives.find((a) => a.id === activeArchiveId);
@@ -398,7 +398,7 @@ export default function App() {
           />
         );
       }
- 
+
       case "DETAIL_ARSIP":
         return (
           <ArchiveDetail
@@ -409,7 +409,7 @@ export default function App() {
             onDelete={handleDeleteArchive}
           />
         );
- 
+
       case "PENCARIAN_ARSIP":
         return (
           <ArchiveSearch
@@ -419,10 +419,10 @@ export default function App() {
             onAddRecentSearch={handleAddRecentSearch}
           />
         );
- 
+
       case "LAPORAN":
         return <Reports archives={visibleArchives} currentUser={currentUser!} />;
- 
+
       case "ARSIP_MENDEKATI_RETENSI":
         return (
           <RetentionWarning
@@ -432,7 +432,7 @@ export default function App() {
             onNavigate={handleNavigate}
           />
         );
- 
+
       case "AUDIT_TRAIL":
         return (
           <AuditTrail
@@ -441,7 +441,7 @@ export default function App() {
             mockUsers={allUsers}
           />
         );
- 
+
       case "KELOLA_PENGGUNA":
         return (
           <UserManagement
@@ -450,19 +450,19 @@ export default function App() {
             onUpdateUsers={handleUpdateUsers}
           />
         );
- 
+
       case "PENGATURAN_SISTEM":
         return <SystemSettings systemConfig={systemConfig} onUpdateConfig={setSystemConfig} />;
- 
+
       default:
         return <Dashboard archives={visibleArchives} currentUser={currentUser} onNavigate={handleNavigate} retentionUrgentList={[]} />;
     }
   };
- 
+
   if (!currentUser) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
- 
+
   return (
     <div 
       className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#F5F0E8] text-[#0B1F3A] font-sans antialiased"
@@ -476,7 +476,7 @@ export default function App() {
         onLogout={handleLogout}
         retentionWarningCount={calculateRetentionAlertCount()}
       />
- 
+
       {/* Main Container */}
       <div className="flex-1 flex flex-col h-full overflow-y-auto pb-16 md:pb-0">
         
@@ -485,7 +485,7 @@ export default function App() {
           {renderPageLayout()}
         </main>
       </div>
- 
+
       {/* Toast Notification */}
       {toast && (
        <div className={`fixed bottom-6 right-6 z-50 flex items-center px-5 py-4 rounded-xl shadow-2xl text-white text-sm font-semibold transition-all duration-300 animate-fadeIn ${
