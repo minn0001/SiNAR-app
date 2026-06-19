@@ -137,8 +137,8 @@ export default function AuditTrail({
     ]);
   
     // Hitung total halaman
-    const firstPageRows = Math.floor((pageH - 75) / rowH); // halaman pertama lebih pendek (ada judul)
-    const otherPageRows = Math.floor((pageH - 45) / rowH); // halaman berikutnya
+    const firstPageRows = Math.floor((pageH - 75) / rowH);
+    const otherPageRows = Math.floor((pageH - 55) / rowH); // ← tambah ruang footer
     let totalPages = 1;
     if (rows.length > firstPageRows) {
       totalPages += Math.ceil((rows.length - firstPageRows) / otherPageRows);
