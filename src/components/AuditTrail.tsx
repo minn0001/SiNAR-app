@@ -69,108 +69,147 @@ export default function AuditTrail({
   });
 
   const handleExportPDF = () => {
-    const printWindow = window.open("", "_blank", "width=100,height=100");
-    if (!printWindow) {
-      alert("Mohon izinkan pop-up.");
-      return;
-    }
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const pageW = 297;
+    const pageH = 210;
+    const margin = 14;
+    const contentW = pageW - margin * 2;
   
-    const tableRows = filteredLogs.map((log) => `
-      <tr>
-        <td>${log.timestamp}</td>
-        <td>${log.userName.split(",")[0]}<br/><small>${log.userRole}</small></td>
-        <td>${log.action}</td>
-        <td>${log.target}</td>
-        <td>${log.ipAddress}<br/><small>${log.device}</small></td>
-      </tr>
-    `).join("");
+    // ── Header navy ──
+    doc.setFillColor(11, 31, 58);
+    doc.rect(0, 0, pageW, 28, "F");
   
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Audit Trail - SiNAR</title>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-        </head>
-        <body>
-          <script>
-            window.onload = function() {
-              const { jsPDF } = window.jspdf;
-              const doc = new jsPDF({ orientation: "landscape" });
+    doc.setTextColor(200, 155, 60);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn.", margin, 11);
   
-              // Header navy
-              doc.setFillColor(11, 31, 58);
-              doc.rect(0, 0, 297, 30, "F");
-              doc.setTextColor(200, 155, 60);
-              doc.setFontSize(13);
-              doc.setFont("helvetica", "bold");
-              doc.text("KANTOR NOTARIS & PPAT RINA MAHARANI, S.H., M.Kn.", 14, 11);
-              doc.setTextColor(255, 255, 255);
-              doc.setFontSize(8);
-              doc.setFont("helvetica", "normal");
-              doc.text("Jl. Sudirman No. 45, Jakarta Selatan  |  Telp. (021) 5551234  |  notaris.rinamaharani@gmail.com", 14, 18);
-              doc.setTextColor(200, 155, 60);
-              doc.setFontSize(7);
-              doc.text("SiNAR - Sistem Arsip Digital", 14, 25);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text("Jl. Sudirman No. 45, Jakarta Selatan  |  Telp. (021) 5551234  |  notaris.rinamaharani@gmail.com", margin, 17);
   
-              // Judul
-              doc.setTextColor(11, 31, 58);
-              doc.setFontSize(14);
-              doc.setFont("helvetica", "bold");
-              doc.text("LOG RIWAYAT AUDIT TRAIL", 148, 42, { align: "center" });
-              doc.setFontSize(9);
-              doc.setFont("helvetica", "normal");
-              doc.setTextColor(100, 100, 100);
-              doc.text("Perekaman menyeluruh kegiatan akses dokumen, login operator, dan sirkulasi draf notarisan", 148, 49, { align: "center" });
-              doc.text("Dicetak pada: ${new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}", 148, 55, { align: "center" });
+    // Garis gold di bawah alamat
+    doc.setDrawColor(200, 155, 60);
+    doc.setLineWidth(0.5);
+    doc.line(margin, 22, pageW - margin, 22);
   
-              // Garis emas
-              doc.setDrawColor(200, 155, 60);
-              doc.setLineWidth(0.5);
-              doc.line(14, 58, 283, 58);
+    doc.setTextColor(200, 155, 60);
+    doc.setFontSize(7);
+    doc.text("SiNAR – Sistem Arsip Digital", margin, 26);
   
-              // Tabel
-              doc.autoTable({
-                startY: 63,
-                head: [["Waktu (WIB)", "Operator", "Peran", "Tindakan", "Target", "IP Address", "Perangkat"]],
-                body: ${JSON.stringify(filteredLogs.map((log) => [
-                  log.timestamp,
-                  log.userName.split(",")[0],
-                  log.userRole,
-                  log.action,
-                  log.target,
-                  log.ipAddress,
-                  log.device
-                ]))},
-                headStyles: { fillColor: [245, 230, 200], textColor: [11, 31, 58], fontStyle: "bold", fontSize: 8 },
-                bodyStyles: { fontSize: 7.5, textColor: [50, 50, 50] },
-                alternateRowStyles: { fillColor: [250, 250, 248] },
-                styles: { lineColor: [232, 220, 200], lineWidth: 0.2 },
-                columnStyles: {
-                  0: { cellWidth: 30 }, 1: { cellWidth: 35 }, 2: { cellWidth: 25 },
-                  3: { cellWidth: 28 }, 4: { cellWidth: 70 }, 5: { cellWidth: 28 }, 6: { cellWidth: 45 }
-                }
-              });
+    // ── Judul ──
+    doc.setTextColor(11, 31, 58);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("LOG RIWAYAT AUDIT TRAIL", pageW / 2, 38, { align: "center" });
   
-              // Footer total
-              const finalY = doc.lastAutoTable.finalY + 8;
-              doc.setFillColor(253, 248, 240);
-              doc.setDrawColor(200, 155, 60);
-              doc.rect(14, finalY, 269, 10, "FD");
-              doc.setTextColor(11, 31, 58);
-              doc.setFontSize(9);
-              doc.setFont("helvetica", "bold");
-              doc.text("TOTAL KESELURUHAN LOG: ${filteredLogs.length} entri", 20, finalY + 6.5);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Perekaman menyeluruh kegiatan akses dokumen, login operator, dan sirkulasi draf notarisan", pageW / 2, 44, { align: "center" });
   
-              doc.save("AuditTrail_SiNAR_${new Date().toISOString().split("T")[0]}.pdf");
-              setTimeout(() => window.close(), 1000);
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+    const tanggalCetak = new Date().toLocaleDateString("id-ID", {
+      weekday: "long", year: "numeric", month: "long", day: "numeric"
+    });
+    doc.setFontSize(7);
+    doc.text(`Dicetak pada: ${tanggalCetak}`, pageW / 2, 49, { align: "center" });
+  
+    // Garis pembatas bawah "dicetak pada"
+    doc.setDrawColor(232, 220, 200);
+    doc.setLineWidth(0.3);
+    doc.line(margin, 52, pageW - margin, 52);
+  
+    // ── Tabel pakai drawTable sama persis seperti Reports ──
+    const headers = ["Waktu (WIB)", "Operator", "Peran", "Tindakan", "Target", "IP Address", "Perangkat"];
+    const colWidths = [32, 38, 28, 28, 68, 30, 45];
+    const rows = filteredLogs.map((log) => [
+      log.timestamp,
+      log.userName.split(",")[0],
+      log.userRole,
+      log.action,
+      log.target,
+      log.ipAddress,
+      log.device
+    ]);
+  
+    const rowH = 8;
+    let startY = 57;
+  
+    // Header row
+    doc.setFillColor(245, 230, 200);
+    doc.rect(margin, startY, colWidths.reduce((a, b) => a + b, 0), rowH, "F");
+    doc.setTextColor(11, 31, 58);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "bold");
+  
+    let x = margin;
+    headers.forEach((h, i) => {
+      doc.text(h, x + 3, startY + 5.5);
+      x += colWidths[i];
+    });
+  
+    // Data rows
+    rows.forEach((row, rIdx) => {
+      const y = startY + rowH * (rIdx + 1);
+  
+      // Cek kalau melebihi halaman
+      if (y + rowH > pageH - 20) return;
+  
+      doc.setFillColor(rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 250 : 255, rIdx % 2 === 0 ? 248 : 255);
+      doc.rect(margin, y, colWidths.reduce((a, b) => a + b, 0), rowH, "F");
+  
+      // Garis bawah tiap row (sekat)
+      doc.setDrawColor(232, 220, 200);
+      doc.setLineWidth(0.2);
+      doc.line(margin, y + rowH, margin + colWidths.reduce((a, b) => a + b, 0), y + rowH);
+  
+      // Garis vertikal antar kolom
+      let cx2 = margin;
+      colWidths.forEach((w) => {
+        doc.line(cx2, y, cx2, y + rowH);
+        cx2 += w;
+      });
+      doc.line(cx2, y, cx2, y + rowH);
+  
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(74, 85, 104);
+      doc.setFontSize(7.5);
+  
+      let cx = margin;
+      row.forEach((cell, i) => {
+        doc.text(String(cell), cx + 3, y + 5.5);
+        cx += colWidths[i];
+      });
+    });
+  
+    // Border luar gold
+    const tableH = rowH * (Math.min(rows.length, Math.floor((pageH - 20 - startY - rowH) / rowH)) + 1);
+    doc.setDrawColor(200, 155, 60);
+    doc.setLineWidth(0.4);
+    doc.rect(margin, startY, colWidths.reduce((a, b) => a + b, 0), tableH, "S");
+  
+    // Footer total
+    const finalY = startY + tableH + 8;
+    doc.setFillColor(253, 248, 240);
+    doc.setDrawColor(200, 155, 60);
+    doc.roundedRect(margin, finalY, contentW, 12, 2, 2, "FD");
+    doc.setTextColor(11, 31, 58);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text(`TOTAL KESELURUHAN LOG: ${filteredLogs.length} entri`, margin + 5, finalY + 8);
+  
+    // Footer halaman
+    doc.setDrawColor(232, 220, 200);
+    doc.setLineWidth(0.3);
+    doc.line(margin, pageH - 14 - 3, pageW - margin, pageH - 14 - 3);
+    doc.setFontSize(7);
+    doc.setTextColor(150, 150, 150);
+    doc.setFont("helvetica", "normal");
+    doc.text("Dicetak otomatis oleh SiNAR – Sistem Arsip Digital Kantor Notaris & PPAT Rina Maharani, S.H., M.Kn.", margin, pageH - 14);
+    doc.text("Hal. 1", pageW - margin, pageH - 14, { align: "right" });
+  
+    doc.save(`AuditTrail_SiNAR_${new Date().toISOString().split("T")[0]}.pdf`);
   };
   
   const handleExportExcel = () => {
