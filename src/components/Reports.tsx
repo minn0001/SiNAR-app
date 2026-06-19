@@ -29,15 +29,23 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { Archive, KategoriArsip, StatusArsip } from "../types";
+import { Archive, KategoriArsip, StatusArsip, User } from "../types";
 import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
+import { canAccessKategori } from "../lib/permissions";
  
 interface ReportsProps {
   archives: Archive[];
+  currentUser: User;
 }
  
-export default function Reports({ archives }: ReportsProps) {
+export default function Reports({ archives, currentUser }: ReportsProps) {
+  // --- RBAC: hanya kategori yang boleh diakses user yang ditampilkan ---
+  // (mis. Notaris hanya melihat Akta Jual Beli & Akta Pendirian Perusahaan)
+  const visibleKategori = Object.values(KategoriArsip).filter((cat) =>
+    canAccessKategori(currentUser, cat)
+  );
+
   const [activeTab, setActiveTab] = useState<
     "Per Kategori" | "Per Periode" | "Rekapitulasi"
   >("Per Kategori");
@@ -50,8 +58,8 @@ export default function Reports({ archives }: ReportsProps) {
   const getCategoryCount = (cat: KategoriArsip) =>
     archives.filter((a) => a.kategori === cat).length;
  
-  // Data 1: Category counts for Chart & Table
-  const categoryChartData = Object.values(KategoriArsip).map((cat) => ({
+  // Data 1: Category counts for Chart & Table (RBAC: kategori yang boleh diakses saja)
+  const categoryChartData = visibleKategori.map((cat) => ({
     Kategori: cat.replace("Akta ", "Akta: "),
     Jumlah: getCategoryCount(cat),
   }));
@@ -292,7 +300,7 @@ export default function Reports({ archives }: ReportsProps) {
       let startY = 58;
  
       if (activeTab === "Per Kategori") {
-        // Tabel Per Kategori
+        // Tabel Per Kategori (RBAC: hanya kategori yang boleh diakses)
         const headers = [
           "No.",
           "Nama Kategori",
@@ -301,7 +309,7 @@ export default function Reports({ archives }: ReportsProps) {
           "Jumlah Berkas",
         ];
         const colWidths = [10, 65, 35, 35, 35];
-        const rows = Object.values(KategoriArsip).map((cat, idx) => {
+        const rows = visibleKategori.map((cat, idx) => {
           let code = "DOK";
           let retention = "5 Tahun";
           if (cat === KategoriArsip.AKTA_JUAL_BELI) {
@@ -332,7 +340,8 @@ export default function Reports({ archives }: ReportsProps) {
         drawTable(pdf, headers, rows, colWidths, startY, margin, contentW, [0, 4]);
         startY += (rows.length + 1) * 8 + 6;
  
-        // Summary box
+        // Summary box (RBAC: total hanya dari kategori yang terlihat)
+        const visibleTotal = visibleKategori.reduce((s, cat) => s + getCategoryCount(cat), 0);
         pdf.setFillColor(253, 248, 240);
         pdf.setDrawColor(200, 155, 60);
         pdf.roundedRect(margin, startY, contentW, 12, 2, 2, "FD");
@@ -340,7 +349,7 @@ export default function Reports({ archives }: ReportsProps) {
         pdf.setFontSize(8);
         pdf.setFont("helvetica", "bold");
         pdf.text(
-          `TOTAL KESELURUHAN ARSIP: ${archives.length} berkas`,
+          `TOTAL KESELURUHAN ARSIP: ${visibleTotal} berkas`,
           margin + 5,
           startY + 8
         );
@@ -502,8 +511,8 @@ export default function Reports({ archives }: ReportsProps) {
       const tanggal = new Date().toLocaleDateString("id-ID");
  
       if (activeTab === "Per Kategori") {
-        // Sheet 1: Data Kategori
-        const data = Object.values(KategoriArsip).map((cat) => {
+        // Sheet 1: Data Kategori (RBAC: hanya kategori yang boleh diakses)
+        const data = visibleKategori.map((cat) => {
           let code = "DOK";
           let retention = "5 Tahun";
           if (cat === KategoriArsip.AKTA_JUAL_BELI) {
@@ -766,7 +775,7 @@ export default function Reports({ archives }: ReportsProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E8DCC8]/65 text-[#4A5568]">
-                {Object.values(KategoriArsip).map((cat, idx) => {
+                {visibleKategori.map((cat, idx) => {
                   let code = "DOK";
                   let retention = "5 Tahun";
                   if (cat === KategoriArsip.AKTA_JUAL_BELI) {
