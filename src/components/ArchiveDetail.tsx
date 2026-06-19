@@ -363,22 +363,6 @@ printWindow.document.close();
               </div>
             </div>
 
-            {/* Tags badges render */}
-            <div className="space-y-2 pt-2">
-              <span className="text-[#718096] text-xs font-semibold uppercase tracking-wider block">Label Kearsipan (Tags) :</span>
-              <div className="flex flex-wrap gap-2">
-                {(archive.tags ?? []).length > 0 ? (
-                  (archive.tags ?? []).map((tg, idx) => (
-                    <span key={idx} className="px-2.5 py-1 text-[10px] font-bold bg-[#F5E6C8] border border-[#C89B3C]/35 rounded-md text-gold-dark font-sans capitalize">
-                      #{tg}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-[#718096] italic">Nihil tags disematkan.</span>
-                )}
-              </div>
-            </div>
-
           </div>
 
           {/* VIRTUAL IN-APP DOCUMENT EMBED VIEWER */}
