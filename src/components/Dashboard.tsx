@@ -167,8 +167,10 @@ export default function Dashboard({
             Selamat Datang di SiNAR
           </h2>
           <p className="text-[#4A5568] text-sm">
-            <p>Sistem Informasi Notaris &amp; Kearsipan Digital Kantor Notaris & PPAT Rina Maharani S.H., M.Kn. 
-            <p>Anda masuk sebagai <span className="text-[#C89B3C] font-semibold capitalize font-mono text-xs px-2 py-0.5 rounded bg-[#F5E6C8] border border-[#C89B3C]/20">{currentUser.role}</span>.
+            Sistem Informasi Notaris &amp; Kearsipan Digital Kantor Notaris &amp; PPAT Rina Maharani S.H., M.Kn.
+          </p>
+          <p className="text-[#4A5568] text-sm mt-1">
+            Anda masuk sebagai <span className="text-[#C89B3C] font-semibold capitalize font-mono text-xs px-2 py-0.5 rounded bg-[#F5E6C8] border border-[#C89B3C]/20">{currentUser.role}</span>.
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-[#718096] font-mono bg-[#F5F0E8]/70 px-3.5 py-2 rounded-lg border border-[#E8DCC8] shrink-0">
