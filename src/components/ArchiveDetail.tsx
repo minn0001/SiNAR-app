@@ -367,8 +367,8 @@ printWindow.document.close();
             <div className="space-y-2 pt-2">
               <span className="text-[#718096] text-xs font-semibold uppercase tracking-wider block">Label Kearsipan (Tags) :</span>
               <div className="flex flex-wrap gap-2">
-                {archive.tags.length > 0 ? (
-                  archive.tags.map((tg, idx) => (
+                {(archive.tags ?? []).length > 0 ? (
+                  (archive.tags ?? []).map((tg, idx) => (
                     <span key={idx} className="px-2.5 py-1 text-[10px] font-bold bg-[#F5E6C8] border border-[#C89B3C]/35 rounded-md text-gold-dark font-sans capitalize">
                       #{tg}
                     </span>
@@ -722,13 +722,13 @@ printWindow.document.close();
                 </h4>
               </div>
               <span className="text-[10px] font-mono bg-[#FAFAF8] border border-[#E8DCC8] text-[#C89B3C] font-semibold px-2 py-0.5 rounded">
-                v{archive.versiDokumen.length || 1} aktif
+                v{(archive.versiDokumen ?? []).length || 1} aktif
               </span>
             </div>
 
             <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
-              {archive.versiDokumen.length > 0 ? (
-                archive.versiDokumen.map((ver, idx) => (
+              {(archive.versiDokumen ?? []).length > 0 ? (
+                (archive.versiDokumen ?? []).map((ver, idx) => (
                   <div key={idx} className="flex gap-2.5 p-2 bg-[#FAFAF8] border border-[#E8DCC8] rounded text-xs text-[#0B1F3A] relative">
                     <span className="absolute top-2 right-2 text-[9px] text-[#A67C2D] font-bold bg-[#F5E6C8] px-1.5 py-0.5 rounded border border-[#C89B3C]/10 font-mono">
                       v{ver.versi}
