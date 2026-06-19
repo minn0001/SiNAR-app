@@ -43,7 +43,14 @@ export default function App() {
   const [loadingArchives, setLoadingArchives] = useState(true);
   const [allUsers, setAllUsers] = useState<User[]>(mockUsers);
   const [allAuditLogs, setAllAuditLogs] = useState<AuditLog[]>(mockAuditLogs);
-  const [systemConfig, setSystemConfig] = useState<SystemConfig>(defaultSystemConfig);
+  const [systemConfig, setSystemConfig] = useState<SystemConfig>(() => {
+    try {
+      const saved = localStorage.getItem("sinar_system_config");
+      return saved ? JSON.parse(saved) : defaultSystemConfig;
+    } catch {
+      return defaultSystemConfig;
+    }
+  });
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error" = "success") => {
@@ -452,7 +459,10 @@ export default function App() {
         );
 
       case "PENGATURAN_SISTEM":
-        return <SystemSettings systemConfig={systemConfig} onUpdateConfig={setSystemConfig} />;
+        return <SystemSettings systemConfig={systemConfig} onUpdateConfig={(newConfig) => {
+          setSystemConfig(newConfig);
+          localStorage.setItem("sinar_system_config", JSON.stringify(newConfig));
+        }} />;
 
       default:
         return <Dashboard archives={visibleArchives} currentUser={currentUser} onNavigate={handleNavigate} retentionUrgentList={[]} />;
