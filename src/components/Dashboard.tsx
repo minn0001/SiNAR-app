@@ -449,12 +449,12 @@ export default function Dashboard({
                     >
                       {act.judulArsip}
                     </button>
-                    <div className="flex items-center gap-4 text-xs text-[#718096]">
-                      <span className="flex items-center gap-1">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[#718096]">
+                      <span className="flex items-center gap-1 whitespace-nowrap">
                         Klien: <strong className="text-[#4A5568]">{act.namaKlien}</strong>
                       </span>
-                      <span>•</span>
-                      <span>Kategori: <strong className="text-[#4A5568]">{act.kategori}</strong></span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="whitespace-nowrap">Kategori: <strong className="text-[#4A5568]">{act.kategori}</strong></span>
                     </div>
                   </div>
 
