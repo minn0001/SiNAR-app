@@ -618,28 +618,28 @@ printWindow.document.close();
                                 archive.fileDokumen?.filename?.toLowerCase().endsWith(".png");
 
                 if (isPdf) {
+                  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                  const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(archive.fileDokumen.url)}&embedded=true`;
                   return (
                     <div className="w-full">
-                      <object
-                        data={archive.fileDokumen.url}
-                        type="application/pdf"
+                      <iframe
+                        src={isMobile ? googleDocsUrl : archive.fileDokumen.url}
                         width="100%"
                         height="500px"
                         style={{ borderRadius: "8px", border: "1px solid #E8DCC8" }}
+                        title={archive.fileDokumen.filename}
                       >
                         <p className="text-xs text-[#718096] text-center p-4">
-                          Browser Anda tidak mendukung tampilan PDF langsung. 
-                          <button 
-                            onClick={handleDownload}
-                            className="text-gold-royal underline ml-1"
-                          >
+                          Browser Anda tidak mendukung tampilan PDF langsung.{" "}
+                          <button onClick={handleDownload} className="text-gold-royal underline ml-1">
                             Unduh berkas
                           </button>
                         </p>
-                      </object>
+                      </iframe>
                     </div>
                   );
                 }
+      
                 else if (isImage) {
                   return (
                     <img 
