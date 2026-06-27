@@ -15,8 +15,6 @@ import {
   Users, 
   Settings, 
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   ShieldCheck,
   Menu,
   X
@@ -41,7 +39,6 @@ export default function Sidebar({
   onLogout,
   retentionWarningCount
 }: NavigationProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // --- RBAC: ganti hardcode role check dengan permissions.ts ---
@@ -77,16 +74,10 @@ export default function Sidebar({
   return (
     <>
       {/* --- DESKTOP COLLAPSIBLE SIDEBAR --- */}
-      <aside 
-        className={`hidden md:flex flex-col bg-[#FFFFFF] border-r border-[#E8DCC8] h-screen sticky top-0 transition-all duration-300 select-none ${
-          isCollapsed ? "w-[85px]" : "w-64"
-        }`}
-      >
+      <aside className="hidden md:flex flex-col bg-[#FFFFFF] border-r border-[#E8DCC8] h-screen sticky top-0 select-none w-64">
         {/* Brand Header */}
-        <div className={`border-b border-[#E8DCC8] bg-[#FAFAF8] flex items-center justify-between h-20 overflow-hidden transition-all duration-300 ${
-          isCollapsed ? "px-2 py-4" : "p-4"
-        }`}>
-          <div className={`flex items-center shrink-0 ${isCollapsed ? "gap-1" : "gap-3"}`}>
+        <div className="border-b border-[#E8DCC8] bg-[#FAFAF8] flex items-center justify-between h-20 overflow-hidden p-4">
+          <div className="flex items-center shrink-0 gap-3">
             <div 
               className="w-11 h-11 rounded-full flex items-center justify-center bg-[#F5E6C8] border border-[#C89B3C] text-[#C89B3C] shrink-0"
               style={{ boxShadow: "0 0 10px rgba(200,155,60,0.15)" }}
@@ -140,23 +131,11 @@ export default function Sidebar({
                 >N</text>
               </svg>
             </div>
-            {!isCollapsed && (
-              <div className="flex flex-col">
-                <span className="font-bold text-lg font-display text-[#0B1F3A] tracking-wide leading-none">SiNAR</span>
-                <span className="text-[10px] text-[#A67C2D] font-medium tracking-widest mt-1 uppercase leading-none">Arsip Digital</span>
-              </div>
-            )}
+            <div className="flex flex-col">
+              <span className="font-bold text-lg font-display text-[#0B1F3A] tracking-wide leading-none">SiNAR</span>
+              <span className="text-[10px] text-[#A67C2D] font-medium tracking-widest mt-1 uppercase leading-none">Arsip Digital</span>
+            </div>
           </div>
-
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`rounded bg-white border border-[#E8DCC8] text-[#A67C2D] hover:bg-[#F5F0E8] transition cursor-pointer flex items-center justify-center shrink-0 ${
-              isCollapsed ? "p-1.5 px-1.5" : "p-1.5 px-2"
-            }`}
-            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            {isCollapsed ? <ChevronRight className="w-4 h-4 text-[#A67C2D]" /> : <ChevronLeft className="w-4 h-4 text-[#A67C2D]" />}
-          </button>
         </div>
 
         {/* User context widget */}
@@ -167,12 +146,10 @@ export default function Sidebar({
                 {currentUser.nama.charAt(0)}
               </span>
             </div>
-            {!isCollapsed && (
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-medium truncate text-[#0B1F3A] leading-tight">{currentUser.nama}</span>
-                <span className="text-[10px] text-[#A67C2D] font-mono font-bold uppercase mt-0.5 tracking-wider">{currentUser.role}</span>
-              </div>
-            )}
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-medium truncate text-[#0B1F3A] leading-tight">{currentUser.nama}</span>
+              <span className="text-[10px] text-[#A67C2D] font-mono font-bold uppercase mt-0.5 tracking-wider">{currentUser.role}</span>
+            </div>
           </div>
         </div>
 
@@ -194,21 +171,15 @@ export default function Sidebar({
                 }`}
               >
                 <Icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? "text-[#C89B3C]" : "text-[#718096] group-hover:text-[#C89B3C]"}`} />
-                {!isCollapsed && <span className="truncate text-xs">{item.label}</span>}
+                <span className="truncate text-xs">{item.label}</span>
 
                 {/* Badge alert */}
                 {item.badge && (
-                  <span className={`absolute ${isCollapsed ? "top-1 right-1" : "right-3"} text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.badgeColor}`}>
+                  <span className={`absolute right-3 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.badgeColor}`}>
                     {item.badge}
                   </span>
                 )}
-
-                {/* Tooltip for collapsed sidebar */}
-                {isCollapsed && (
-                  <div className="absolute left-[85px] bg-white border border-[#E8DCC8] text-[#0B1F3A] text-xs py-1 px-2.5 rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 whitespace-nowrap shadow-xl">
-                    {item.label}
-                  </div>
-                )}
+                
               </button>
             );
           })}
@@ -221,7 +192,7 @@ export default function Sidebar({
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#EF4444] hover:bg-red-500/10 transition cursor-pointer overflow-hidden`}
           >
             <LogOut className="w-5 h-5 text-[#EF4444] shrink-0" />
-            {!isCollapsed && <span className="font-semibold text-xs text-[#EF4444]">Keluar Sistem</span>}
+            <span className="font-semibold text-xs text-[#EF4444]">Keluar Sistem</span>
           </button>
         </div>
       </aside>
