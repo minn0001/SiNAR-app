@@ -161,13 +161,13 @@ export default function SystemSettings({ systemConfig, onUpdateConfig }: SystemS
                 className="w-full bg-white border border-[#C89B3C] focus:border-[#A67C2D] focus:outline-none rounded-lg p-3 text-xs text-[#0B1F3A] uppercase font-mono tracking-widest focus:ring-1 focus:ring-[#C89B3C] transition"
               />
             ) : (
-              <div className="w-full bg-[#FAFAF8] border border-[#E8DCC8] rounded-lg p-3 text-xs text-[#718096] uppercase font-mono tracking-widest select-all">
+              <div className="w-full bg-[#FAFAF8] border border-[#E8DCC8] rounded-lg p-3 text-xs text-[#718096] uppercase font-mono tracking-widest select-all break-all overflow-hidden">
                 {systemConfig.nomorFormat}
               </div>
             )}
             <div className="p-3 bg-[#FAFAF8] border border-[#E8DCC8] rounded-lg space-y-2 select-none">
               <span className="text-[10px] text-[#718096] font-bold uppercase tracking-wider block">Legenda Tag Variabel:</span>
-              <div className="grid grid-cols-2 gap-1.5 font-mono text-[10px] leading-relaxed text-[#4A5568]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[10px] leading-relaxed text-[#4A5568]">
                 <span>• <strong className="text-[#0B1F3A]">{"{urut}"}</strong> : Nomor urutan</span>
                 <span>• <strong className="text-[#0B1F3A]">{"{KATEGORI}"}</strong> : Singkatan internal</span>
                 <span>• <strong className="text-[#0B1F3A]">{"{BULAN_ROMAWI}"}</strong> : Bulan (I-XII)</span>
