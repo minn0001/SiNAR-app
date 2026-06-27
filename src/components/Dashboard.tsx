@@ -433,7 +433,11 @@ export default function Dashboard({
 
           <div className="divide-y divide-[#E8DCC8]/40">
             {recentActivities.map((act) => {
-              const uploader = act.createdBy === "usr-01" ? "Hendrawan S." : (act.createdBy === "usr-03" ? "Prasetyo U." : "Dewi L.");
+              const uploaderMap: Record<string, { nama: string; role: string }> = {
+                "usr-01": { nama: "Hendrawan S.", role: "Admin" },
+                "usr-03": { nama: "Prasetyo U.", role: "Notaris" },
+              };
+              const uploader = uploaderMap[act.createdBy] ?? { nama: "Dewi L.", role: "Staff" };
               return (
                 <div 
                   key={act.id} 
@@ -461,7 +465,7 @@ export default function Dashboard({
                   <div className="sm:text-right text-xs text-[#718096] shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1">
                     <span className="font-mono text-[10px] text-[#718096]">{act.createdAt} WIB</span>
                     <span className="text-[10px] bg-[#F5F0E8] border border-[#E8DCC8] text-[#4A5568] font-semibold px-2 py-0.5 rounded uppercase">
-                      petugas: {uploader}
+                      {uploader.role}: {uploader.nama}
                     </span>
                   </div>
                 </div>
