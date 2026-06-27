@@ -338,30 +338,66 @@ export default function Sidebar({
           );
         })}
 
-        {/* Jika Admin, izinkan navigasi ke halaman administratif lewat tombol siklus */}
+        {/* Admin popup menu */}
         {can(currentUser, "kelola_pengguna") && (
-          <button
-            onClick={() => {
-              // Cyclically switches between administrative pages
-              if (currentPage === "AUDIT_TRAIL") {
-                setCurrentPage("KELOLA_PENGGUNA");
-              } else if (currentPage === "KELOLA_PENGGUNA") {
-                setCurrentPage("PENGATURAN_SISTEM");
-              } else {
-                setCurrentPage("AUDIT_TRAIL");
-              }
-            }}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-[10px] relative transition-colors cursor-pointer ${
-              ["AUDIT_TRAIL", "KELOLA_PENGGUNA", "PENGATURAN_SISTEM"].includes(currentPage)
-                ? "text-gold-royal font-semibold" 
-                : "text-slate-500 hover:text-white"
-            }`}
-          >
-            <Settings className="w-5 h-5 mb-0.5" />
-            <span className="scale-90 text-[9px] font-medium leading-none">
-              {currentPage === "KELOLA_PENGGUNA" ? "Admin:User" : currentPage === "PENGATURAN_SISTEM" ? "Admin:Set" : "Admin:Log"}
-            </span>
-          </button>
+          <div className="relative flex-1 h-full">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`flex flex-col items-center justify-center w-full h-full py-1 text-[10px] transition-colors cursor-pointer ${
+                ["AUDIT_TRAIL", "KELOLA_PENGGUNA", "PENGATURAN_SISTEM"].includes(currentPage)
+                  ? "text-gold-royal font-semibold"
+                  : "text-slate-500 hover:text-white"
+              }`}
+            >
+              <Settings className={`w-5 h-5 mb-0.5 transition-transform duration-200 ${mobileMenuOpen ? "rotate-45 text-gold-royal" : ""}`} />
+              <span className="scale-90 text-[9px] font-medium leading-none">Admin</span>
+            </button>
+        
+            {/* Popup menu */}
+            {mobileMenuOpen && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setMobileMenuOpen(false)}
+                />
+        
+                {/* Menu popup */}
+                <div className="absolute bottom-[68px] right-0 z-50 bg-[#0B1F3A] border border-gold-royal/30 rounded-xl shadow-2xl overflow-hidden w-44 animate-fadeIn">
+                  <div className="px-3 py-2 border-b border-gold-royal/20">
+                    <span className="text-[9px] text-gold-royal font-mono uppercase tracking-widest">Menu Admin</span>
+                  </div>
+        
+                  {[
+                    { id: "AUDIT_TRAIL", label: "Audit Sistem", icon: History },
+                    { id: "KELOLA_PENGGUNA", label: "Kelola User", icon: Users },
+                    { id: "PENGATURAN_SISTEM", label: "Pengaturan", icon: Settings },
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    const isActive = currentPage === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setCurrentPage(item.id);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs transition-colors cursor-pointer ${
+                          isActive
+                            ? "bg-gold-royal/20 text-gold-royal font-semibold"
+                            : "text-slate-300 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-gold-royal" : "text-slate-400"}`} />
+                        {item.label}
+                        {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold-royal" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
         )}
       </nav>
     </>
