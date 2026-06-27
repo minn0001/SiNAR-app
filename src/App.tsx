@@ -499,7 +499,7 @@ setAllArchives(prev => prev.filter((a) => a.id !== id));
       <div className="flex-1 flex flex-col h-full overflow-y-auto pb-16 md:pb-0">
         
         {/* Content Sheet */}
-        <main className="flex-1 p-4 md:p-6 pt-18 md:pt-6 w-full max-w-6xl">
+        <main className="flex-1 p-4 md:p-6 pt-4 md:pt-6 w-full max-w-6xl">
           {renderPageLayout()}
         </main>
       </div>
