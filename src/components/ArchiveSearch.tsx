@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Search, 
-  History, 
   SlidersHorizontal, 
-  ChevronRight, 
   ArrowRight,
   User as UserIcon,
   FolderLock,
@@ -15,15 +13,11 @@ import { Archive, KategoriArsip, StatusArsip } from "../types";
 interface ArchiveSearchProps {
   archives: Archive[];
   onNavigate: (page: string, activeId?: string | null) => void;
-  recentSearches: string[];
-  onAddRecentSearch: (query: string) => void;
 }
 
 export default function ArchiveSearch({
   archives,
   onNavigate,
-  recentSearches,
-  onAddRecentSearch
 }: ArchiveSearchProps) {
   
   const [nomorArsip, setNomorArsip] = useState("");
@@ -38,12 +32,10 @@ export default function ArchiveSearch({
   const [searchResults, setSearchResults] = useState<Archive[] | null>(null);
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
-  // Cek apakah ada field yang diisi
   const hasAnyInput = nomorArsip || judulArsip || namaKlien || lokasiFisik ||
     kategori !== "Semua Kategori" || statusArsip !== "Semua Status" ||
     unitPengolah !== "Semua Unit" || tanggalDari || tanggalSampai;
 
-  // Real-time search via useEffect
   useEffect(() => {
     if (!hasAnyInput) {
       setSearchResults(null);
@@ -67,24 +59,7 @@ export default function ArchiveSearch({
     });
 
     setSearchResults(results);
-
-    // Simpan ke recent searches kalau ada teks yang diketik
-    const token = [judulArsip, nomorArsip, namaKlien, lokasiFisik].filter(Boolean).join(" & ");
-    if (token) onAddRecentSearch(token);
-
   }, [nomorArsip, judulArsip, namaKlien, lokasiFisik, kategori, statusArsip, unitPengolah, tanggalDari, tanggalSampai]);
-
-  const rerunHistoryQuery = (queryText: string) => {
-    setJudulArsip(queryText);
-    setNomorArsip("");
-    setNamaKlien("");
-    setLokasiFisik("");
-    setKategori("Semua Kategori");
-    setStatusArsip("Semua Status");
-    setUnitPengolah("Semua Unit");
-    setTanggalDari("");
-    setTanggalSampai("");
-  };
 
   const clearSearch = () => {
     setNomorArsip("");
@@ -113,7 +88,7 @@ export default function ArchiveSearch({
   const getStatusBadge = (status: StatusArsip) => {
     switch (status) {
       case StatusArsip.AKTIF: return "bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/25";
-      case StatusArsip.INAKTIF: return "bg-slate-500/10 text-[#718096] border border-slate-350";
+      case StatusArsip.INAKTIF: return "bg-slate-500/10 text-[#718096] border border-slate-300";
       case StatusArsip.PERMANEN: return "bg-[#F5E6C8] text-[#A67C2D] border border-[#C89B3C]/30";
       case StatusArsip.MENUNGGU_PEMUSNAHAN: return "bg-[#EF4444]/15 text-[#EF4444] border border-[#EF4444]/25";
     }
@@ -127,7 +102,7 @@ export default function ArchiveSearch({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         {/* LEFT: FILTER PANEL */}
         <div className="lg:col-span-4 bg-white p-5 rounded-xl border border-[#E8DCC8] shadow-[0_2px_12px_rgba(11,31,58,0.08)] space-y-4 h-fit font-sans">
           <div className="border-b border-[#E8DCC8] pb-3 flex items-center justify-between">
@@ -213,24 +188,6 @@ export default function ArchiveSearch({
               </div>
             </div>
           </div>
-
-          {/* Recent Searches */}
-          <div className="border-t border-[#E8DCC8] pt-4 space-y-2.5">
-            <span className="text-[11px] font-bold text-[#0B1F3A] flex items-center gap-1.5 uppercase tracking-wider select-none">
-              <History className="w-4 h-4 text-[#C89B3C]" /> Pencarian Terbaru
-            </span>
-            <div className="flex flex-col gap-1.5">
-              {recentSearches.length > 0 ? recentSearches.map((term, i) => (
-                <button key={i} onClick={() => rerunHistoryQuery(term)}
-                  className="w-full flex items-center justify-between p-2 rounded bg-[#FAFAF8] hover:bg-[#FDF8F0] border border-[#E8DCC8] hover:border-[#C89B3C] text-xs text-left text-[#4A5568] hover:text-[#C89B3C] transition cursor-pointer group">
-                  <span className="truncate pr-4">{term}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#C89B3C]" />
-                </button>
-              )) : (
-                <span className="text-[10px] text-slate-400 italic">Pencarian historis Anda kosong.</span>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* RIGHT: RESULTS */}
@@ -281,7 +238,7 @@ export default function ArchiveSearch({
                       {item.lokasiFisik && (
                         <span className="flex items-center gap-1 font-mono text-[11px]">
                           <MapPin className="w-3 h-3 text-slate-400" />
-                          <span className="text-[#718096]">{highlightMatch(item.lokasiFisik, activeSearchTerm)}</span>
+                          <span>{highlightMatch(item.lokasiFisik, activeSearchTerm)}</span>
                         </span>
                       )}
                     </div>
