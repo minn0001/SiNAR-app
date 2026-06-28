@@ -28,13 +28,12 @@ import { QRCodeSVG } from "qrcode.react";
 import { Archive, KategoriArsip, StatusArsip, User, UserRole } from "../types";
 import { canEdit as checkCanEdit } from "../lib/permissions";
 
-  interface ArchiveDetailProps {
+    interface ArchiveDetailProps {
     archiveId: string;
     archives: Archive[];
     currentUser: User;
     onNavigate: (page: string, activeId?: string | null) => void;
     onDelete: (id: string) => void;
-    previousPage?: string;
   }
   
   export default function ArchiveDetail({
@@ -42,8 +41,7 @@ import { canEdit as checkCanEdit } from "../lib/permissions";
     archives,
     currentUser,
     onNavigate,
-    onDelete,
-    previousPage = "DAFTAR_ARSIP"
+    onDelete
   }: ArchiveDetailProps) {
   
   const archive = archives.find(a => a.id === archiveId);
@@ -231,23 +229,19 @@ printWindow.document.close();
     }
   };
 
-  return (
+   return (
     <div className="space-y-6">
       {/* 1. BREADCRUMBS RAIL */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-gold-royal/15 shadow-[0_2px_12px_rgba(11,31,58,0.08)] no-print">
         <div className="text-xs text-[#718096] font-medium">
-          Beranda &gt; <span className="hover:text-gold-royal cursor-pointer select-none" 
-            onClick={() => onNavigate(previousPage)}>
-            {previousPage === "PENCARIAN_ARSIP" ? "Pencarian" : "Daftar Arsip"}
-          </span> &gt; {" "}
+          Beranda &gt; <span className="hover:text-gold-royal cursor-pointer select-none" onClick={() => onNavigate("DAFTAR_ARSIP")}>Daftar Arsip</span> &gt; {" "}
           <strong className="text-gold-royal font-semibold">Rincian Arsip</strong>
         </div>
         <button
-          onClick={() => onNavigate(previousPage)}
+          onClick={() => onNavigate("DAFTAR_ARSIP")}
           className="text-xs text-[#718096] hover:text-[#0B1F3A] flex items-center gap-1.5 cursor-pointer font-sans"
         >
-          <ChevronLeft className="w-4 h-4 text-[#C89B3C]" /> 
-          {previousPage === "PENCARIAN_ARSIP" ? "Kembali ke Pencarian" : "Kembali ke Daftar"}
+          <ChevronLeft className="w-4 h-4 text-[#C89B3C]" /> Kembali ke Daftar
         </button>
       </div>
 
