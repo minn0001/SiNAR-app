@@ -225,15 +225,16 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 <Lock className="w-4 h-4" />
               </span>
               <input
-                id="login-password-input"
-                type="hidden"
-                value={password}
-              />
-              <div className="w-full bg-[#FFFFFF] text-[#0B1F3A] text-sm border border-[#D4B896] rounded-lg py-3 pl-10 pr-4">
-                {password ? "••••••••••••" : <span className="text-[#A0AEC0]">masukkan kata sandi</span>}
+                  id="login-password-input"
+                  type="password"
+                  placeholder="masukkan kata sandi"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[#FFFFFF] text-[#0B1F3A] placeholder-[#A0AEC0] text-sm border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg py-3 pl-10 pr-4 transition duration-200 focus:ring-1 focus:ring-gold-royal"
+                  required
+                />
               </div>
             </div>
-          </div>
 
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 cursor-pointer text-xs text-[#4A5568] select-none">
