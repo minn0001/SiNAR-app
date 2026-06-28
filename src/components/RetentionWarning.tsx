@@ -93,43 +93,15 @@ export default function RetentionWarning({
   };
 
   // Interactive: Mark for destruction
-  const markAsWaitingDestruction = async (id: string) => {
-    console.log("Row ditemukan:", row); // ← tambah ini
-    console.log("Row Supabase id:", row.id); // ← tambah ini
-  // Cari row di Supabase berdasarkan id arsip yang ada di dalam kolom 'data'
-  const { data: rows, error: fetchError } = await supabase
-    .from('arsip')
-    .select('id, data')
-    .eq('data->>id', id); // id arsip ada di dalam JSON
-
-    console.log("Hasil fetch:", rows, "Error:", fetchError); // ← tambah ini
-
-  if (fetchError || !rows || rows.length === 0) {
-    alert("Arsip tidak ditemukan di database.");
-    return;
-  }
-
-  const row = rows[0];
-  const updatedData = {
-    ...row.data,
-    statusArsip: StatusArsip.MENUNGGU_PEMUSNAHAN,
-    updatedAt: new Date().toISOString(),
-    updatedBy: currentUser.id
+  const markAsWaitingDestruction = (id: string) => {
+    const updated = archives.map(a =>
+      a.id === id
+        ? { ...a, statusArsip: StatusArsip.MENUNGGU_PEMUSNAHAN }
+        : a
+    );
+    onUpdateArchives(updated);
+    alert("Status berhasil diubah ke 'Menunggu Pemusnahan'.");
   };
-
-  console.log("Data yang akan diupdate:", updatedData); // ← tambah ini
-
-  const { error: updateError } = await supabase
-    .from('arsip')
-    .update({ data: updatedData })
-    .eq('id', row.id); // ini id row Supabase (int8), bukan id arsip
-
-  console.log("Update error:", updateError); // ← tambah ini
-
-  if (updateError) {
-    alert("Gagal menyimpan perubahan status. Coba lagi.");
-    return;
-  }
 
   // Update local state
   const updated = archives.map(a =>
