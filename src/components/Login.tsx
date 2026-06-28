@@ -229,13 +229,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 type="hidden"
                 value={password}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-gold-royal transition"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              <div className="w-full bg-[#F5F0E8] text-[#A0AEC0] text-sm border border-[#D4B896] rounded-lg py-3 pl-10 pr-4 italic">
+                {password ? "••••••••••••" : "masukkan kata sandi"}
+              </div>
             </div>
           </div>
 
