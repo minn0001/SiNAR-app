@@ -19,7 +19,6 @@ import {
   X
 } from "lucide-react";
 import { Archive, StatusArsip, User, UserRole } from "../types";
-import { supabase } from '../lib/supabaseClient';
 
 interface RetentionWarningProps {
   archives: Archive[];
@@ -94,14 +93,6 @@ export default function RetentionWarning({
 
   // Interactive: Mark for destruction
   const markAsWaitingDestruction = (id: string) => {
-    const updated = archives.map(a =>
-      a.id === id
-        ? { ...a, statusArsip: StatusArsip.MENUNGGU_PEMUSNAHAN }
-        : a
-    );
-    onUpdateArchives(updated);
-    alert("Status berhasil diubah ke 'Menunggu Pemusnahan'.");
-  };
 
   // Update local state
   const updated = archives.map(a =>
