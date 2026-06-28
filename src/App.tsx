@@ -263,6 +263,25 @@ export default function App() {
   // Bulk actions or general state swaps
   const handleUpdateArchivesList = (updated: Archive[]) => {
     setAllArchives(updated);
+    
+      // Sync perubahan ke Supabase
+    for (const archive of updated) {
+      const original = allArchives.find(a => a.id === archive.id);
+      if (original && original.statusArsip !== archive.statusArsip) {
+        // Ada perubahan status, update ke Supabase
+        const { data: rows } = await supabase
+          .from('arsip')
+          .select('id, data')
+          .eq('data->>id', archive.id);
+        
+        if (rows && rows.length > 0) {
+          await supabase
+            .from('arsip')
+            .update({ data: { ...rows[0].data, statusArsip: archive.statusArsip } })
+            .eq('id', rows[0].id);
+        }
+      }
+    }
   };
 
   // Delete gate action
