@@ -93,16 +93,14 @@ export default function RetentionWarning({
 
   // Interactive: Mark for destruction
   const markAsWaitingDestruction = (id: string) => {
-
-  // Update local state
-  const updated = archives.map(a =>
-    a.id === id
-      ? { ...a, statusArsip: StatusArsip.MENUNGGU_PEMUSNAHAN }
-      : a
-  );
-  onUpdateArchives(updated);
-  alert("Status berhasil diubah ke 'Menunggu Pemusnahan'.");
-};
+    const updated = archives.map(a =>
+      a.id === id
+        ? { ...a, statusArsip: StatusArsip.MENUNGGU_PEMUSNAHAN }
+        : a
+    );
+    onUpdateArchives(updated);
+    alert("Status berhasil diubah ke 'Menunggu Pemusnahan'.");
+  };
 
   const handleSelectArchiveForDestruction = (id: string) => {
     if (selectedForDestruction.includes(id)) {
