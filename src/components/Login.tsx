@@ -229,8 +229,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 type="hidden"
                 value={password}
               />
-              <div className="w-full bg-[#F5F0E8] text-[#A0AEC0] text-sm border border-[#D4B896] rounded-lg py-3 pl-10 pr-4 italic">
-                {password ? "••••••••••••" : "masukkan kata sandi"}
+              <div className="w-full bg-[#FFFFFF] text-[#0B1F3A] text-sm border border-[#D4B896] rounded-lg py-3 pl-10 pr-4">
+                {password ? "••••••••••••" : <span className="text-[#A0AEC0]">masukkan kata sandi</span>}
               </div>
             </div>
           </div>
