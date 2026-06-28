@@ -233,6 +233,13 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   className="w-full bg-[#FFFFFF] text-[#0B1F3A] placeholder-[#A0AEC0] text-sm border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg py-3 pl-10 pr-4 transition duration-200 focus:ring-1 focus:ring-gold-royal"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-gold-royal transition"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
