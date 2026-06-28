@@ -100,7 +100,8 @@ export default function RetentionWarning({
 
   // Interactive: Mark for destruction
   const markAsWaitingDestruction = async (id: string) => {
-    console.log("Mencari arsip dengan id:", id); // ← tambah ini
+    console.log("Row ditemukan:", row); // ← tambah ini
+    console.log("Row Supabase id:", row.id); // ← tambah ini
   // Cari row di Supabase berdasarkan id arsip yang ada di dalam kolom 'data'
   const { data: rows, error: fetchError } = await supabase
     .from('arsip')
@@ -122,10 +123,14 @@ export default function RetentionWarning({
     updatedBy: currentUser.id
   };
 
+  console.log("Data yang akan diupdate:", updatedData); // ← tambah ini
+
   const { error: updateError } = await supabase
     .from('arsip')
     .update({ data: updatedData })
     .eq('id', row.id); // ini id row Supabase (int8), bukan id arsip
+
+  console.log("Update error:", updateError); // ← tambah ini
 
   if (updateError) {
     alert("Gagal menyimpan perubahan status. Coba lagi.");
