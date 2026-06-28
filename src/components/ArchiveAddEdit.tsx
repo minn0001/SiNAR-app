@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabaseClient';
 import { 
   UploadCloud, 
   Trash, 
