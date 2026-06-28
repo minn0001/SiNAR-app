@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from './lib/supabaseClient';
 import Sidebar from "./components/Sidebar";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
