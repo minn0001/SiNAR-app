@@ -47,7 +47,6 @@ export default function App() {
       return defaultSystemConfig;
     }
   });
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error" = "success") => {
   setToast({ message, type });
@@ -321,11 +320,6 @@ setAllArchives(prev => prev.filter((a) => a.id !== id));
     setAllUsers(freshUsers);
   };
 
-  const handleAddRecentSearch = (query: string) => {
-    if (!query || recentSearches.includes(query)) return;
-    setRecentSearches((prev) => [query, ...prev.slice(0, 4)]);
-  };
-
   // Calculate the sidebar notification badge count (Archives nearing retention/overdue within 180 days)
   const calculateRetentionAlertCount = (): number => {
     const todayMs = new Date("2026-06-08").getTime();
@@ -448,8 +442,6 @@ setAllArchives(prev => prev.filter((a) => a.id !== id));
           <ArchiveSearch
             archives={visibleArchives}
             onNavigate={handleNavigate}
-            recentSearches={recentSearches}
-            onAddRecentSearch={handleAddRecentSearch}
           />
         );
 
