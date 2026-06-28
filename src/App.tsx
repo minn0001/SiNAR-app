@@ -46,6 +46,7 @@ export default function App() {
       return defaultSystemConfig;
     }
   });
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error" = "success") => {
   setToast({ message, type });
@@ -219,6 +220,11 @@ export default function App() {
       showToast("Anda tidak memiliki akses ke halaman ini.", "error");
       return; // batalkan navigasi, tetap di halaman semula
     }
+
+    setCurrentPage(page);
+    if (activeId !== null) {
+      setActiveArchiveId(activeId);
+    }
   };
 
   // Archive edits or creation saves
@@ -309,6 +315,11 @@ setAllArchives(prev => prev.filter((a) => a.id !== id));
 
   const handleUpdateUsers = (freshUsers: User[]) => {
     setAllUsers(freshUsers);
+  };
+
+  const handleAddRecentSearch = (query: string) => {
+    if (!query || recentSearches.includes(query)) return;
+    setRecentSearches((prev) => [query, ...prev.slice(0, 4)]);
   };
 
   // Calculate the sidebar notification badge count (Archives nearing retention/overdue within 180 days)
@@ -433,6 +444,8 @@ setAllArchives(prev => prev.filter((a) => a.id !== id));
           <ArchiveSearch
             archives={visibleArchives}
             onNavigate={handleNavigate}
+            recentSearches={recentSearches}
+            onAddRecentSearch={handleAddRecentSearch}
           />
         );
 
