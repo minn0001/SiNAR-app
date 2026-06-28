@@ -261,7 +261,7 @@ export default function App() {
 };
   
   // Bulk actions or general state swaps
-  const handleUpdateArchivesList = (updated: Archive[]) => {
+  const handleUpdateArchivesList = async (updated: Archive[]) => {
     setAllArchives(updated);
     
       // Sync perubahan ke Supabase
