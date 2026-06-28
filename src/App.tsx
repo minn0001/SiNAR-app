@@ -18,7 +18,6 @@ import AuditTrail from "./components/AuditTrail";
 import UserManagement from "./components/UserManagement";
 import SystemSettings from "./components/SystemSettings";
 import SessionTimeoutModal from "./components/SessionTimeoutModal";
-const [previousPage, setPreviousPage] = useState<string>("DAFTAR_ARSIP");
 
 import { mockUsers, mockArchives, mockAuditLogs, defaultSystemConfig } from "./mockData";
 import { Archive, User, AuditLog, SystemConfig } from "./types";
@@ -219,14 +218,6 @@ export default function App() {
     if (page !== "LOGIN" && !canAccessPage(currentUser, page)) {
       showToast("Anda tidak memiliki akses ke halaman ini.", "error");
       return; // batalkan navigasi, tetap di halaman semula
-    }
-    // Simpan halaman sebelumnya kalau mau ke DETAIL_ARSIP
-    if (page === "DETAIL_ARSIP") {
-      setPreviousPage(currentPage);
-    }
-    setCurrentPage(page);
-    if (activeId !== null) {
-      setActiveArchiveId(activeId);
     }
   };
 
