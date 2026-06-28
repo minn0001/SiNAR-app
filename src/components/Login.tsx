@@ -226,7 +226,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               </span>
               <input
                   id="login-password-input"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="masukkan kata sandi"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
