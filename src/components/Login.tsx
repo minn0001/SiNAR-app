@@ -14,7 +14,7 @@ interface LoginProps {
 
 export default function Login({ onLoginSuccess }: LoginProps) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("password123"); // default mock password
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -226,12 +226,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               </span>
               <input
                 id="login-password-input"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                type="hidden"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#FFFFFF] text-[#0B1F3A] placeholder-[#A0AEC0] text-sm border border-[#D4B896] focus:border-gold-royal focus:outline-none rounded-lg py-3 pl-10 pr-10 transition duration-200 focus:ring-1 focus:ring-gold-royal"
-                required
               />
               <button
                 type="button"
