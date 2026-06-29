@@ -33,6 +33,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState<string>("LOGIN");
   const [activeArchiveId, setActiveArchiveId] = useState<string | null>(null);
+  const [previousPage, setPreviousPage] = useState<string>("DAFTAR_ARSIP");
   
   const [allArchives, setAllArchives] = useState<Archive[]>([]);
   const [loadingArchives, setLoadingArchives] = useState(true);
@@ -221,6 +222,9 @@ export default function App() {
       return; // batalkan navigasi, tetap di halaman semula
     }
 
+    if (page === "DETAIL_ARSIP") {
+      setPreviousPage(currentPage);
+    }
     setCurrentPage(page);
     if (activeId !== null) {
       setActiveArchiveId(activeId);
@@ -436,6 +440,7 @@ setAllArchives(prev => prev.filter((a) => a.id !== id));
             currentUser={currentUser}
             onNavigate={handleNavigate}
             onDelete={handleDeleteArchive}
+            previousPage={previousPage}
           />
         );
 
