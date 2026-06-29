@@ -773,49 +773,49 @@ export default function ArchiveList({
         <div className="fixed inset-0 bg-[#0B1F3A]/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 font-sans">
           <div className="bg-white rounded-xl shadow-2xl border border-gold-royal/20 max-w-2xl w-full flex flex-col overflow-hidden max-h-[90vh] animate-scaleIn">
             
-            {/* Header / Title Bar */}
-            <div className="p-4 bg-[#FAFAF8] border-b border-[#E8DCC8] flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2.5">
-                <span className="w-10 h-10 rounded-full bg-[#F5E6C8]/60 flex items-center justify-center text-gold-royal shrink-0">
-                  <Eye className="w-5 h-5" />
+          {/* Header / Title Bar */}
+          <div className="p-3 bg-[#FAFAF8] border-b border-[#E8DCC8] flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-8 h-8 rounded-full bg-[#F5E6C8]/60 flex items-center justify-center text-gold-royal shrink-0">
+                <Eye className="w-4 h-4" />
+              </span>
+              <div className="min-w-0">
+                <h3 className="font-bold text-xs text-[#0B1F3A] block font-display">
+                  Peninjau Berkas
+                </h3>
+                <span className="text-[10px] text-[#718096] font-mono uppercase font-semibold truncate block max-w-[130px] sm:max-w-none">
+                  {archiveToPreview.fileDokumen?.filename || "DOKUMEN_ARSIP.pdf"}
                 </span>
-                <div>
-                  <h3 className="font-bold text-sm text-[#0B1F3A] block font-display">
-                    Aplikasi Peninjau Berkas Digital
-                  </h3>
-                  <span className="text-[10px] text-[#718096] font-mono uppercase font-semibold">
-                    {archiveToPreview.fileDokumen?.filename || "DOKUMEN_ARSIP.pdf"} ({((archiveToPreview.fileDokumen?.size || 1542000) / (1024 * 1024)).toFixed(2)} MB)
-                  </span>
-                </div>
-              </div>
-
-              {/* Toolbar Controls */}
-              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => setViewerZoom(Math.max(50, viewerZoom - 25))}
-                  className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition cursor-pointer"
-                  title="Perkecil"
-                >
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <span className="text-xs font-bold text-[#0B1F3A] font-mono w-10 text-center">{viewerZoom}%</span>
-                <button
-                  onClick={() => setViewerZoom(Math.min(200, viewerZoom + 25))}
-                  className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition cursor-pointer"
-                  title="Perbesar"
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </button>
-                <div className="w-[1px] h-6 bg-[#E8DCC8] mx-1" />
-                <button
-                  onClick={() => setArchiveToPreview(null)}
-                  className="p-1.5 bg-slate-100 hover:bg-slate-200 text-[#4A5568] rounded-full transition cursor-pointer"
-                  title="Tutup"
-                >
-                  <X className="w-4 h-4" />
-                </button>
               </div>
             </div>
+          
+            {/* Toolbar Controls */}
+            <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setViewerZoom(Math.max(50, viewerZoom - 25))}
+                className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition cursor-pointer"
+                title="Perkecil"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <span className="text-xs font-bold text-[#0B1F3A] font-mono w-8 text-center">{viewerZoom}%</span>
+              <button
+                onClick={() => setViewerZoom(Math.min(200, viewerZoom + 25))}
+                className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition cursor-pointer"
+                title="Perbesar"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+              <div className="w-[1px] h-5 bg-[#E8DCC8] mx-0.5" />
+              <button
+                onClick={() => setArchiveToPreview(null)}
+                className="p-1.5 bg-slate-100 hover:bg-slate-200 text-[#4A5568] rounded-full transition cursor-pointer"
+                title="Tutup"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
 
             {/* Document Render Area (Page Mockup) */}
             <div id="preview-modal-content" className="p-6 bg-[#F5F0E8] border-b border-[#E8DCC8] flex justify-center items-start overflow-auto flex-1 select-text max-h-[550px]">
