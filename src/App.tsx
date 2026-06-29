@@ -48,6 +48,17 @@ export default function App() {
     }
   });
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+    const [searchState, setSearchState] = useState({
+    nomorArsip: "",
+    judulArsip: "",
+    namaKlien: "",
+    lokasiFisik: "",
+    kategori: "Semua Kategori",
+    statusArsip: "Semua Status",
+    unitPengolah: "Semua Unit",
+    tanggalDari: "",
+    tanggalSampai: "",
+  });
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error" = "success") => {
   setToast({ message, type });
@@ -451,6 +462,8 @@ setAllArchives(prev => prev.filter((a) => a.id !== id));
             onNavigate={handleNavigate}
             recentSearches={recentSearches}
             onAddRecentSearch={handleAddRecentSearch}
+            searchState={searchState}
+            onSearchStateChange={setSearchState}
           />
         );
 
