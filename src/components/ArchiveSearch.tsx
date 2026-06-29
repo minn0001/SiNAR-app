@@ -226,7 +226,9 @@ export default function ArchiveSearch({
               <div className="w-12 h-12 rounded-full border border-[#E8DCC8] bg-[#FAFAF8] flex items-center justify-center mb-4 animate-pulse">
                 <Search className="w-5 h-5 text-[#C89B3C]" />
               </div>
-              <p className="font-semibold text-[#0B1F3A] text-sm">Gunakan panel kiri untuk menyaring database</p>
+              <p className="font-semibold text-[#0B1F3A] text-sm">
+                Gunakan <span className="hidden sm:inline">panel kiri</span><span className="sm:hidden">form di atas</span> untuk menyaring database
+              </p>
               <p className="text-xs text-[#718096] mt-1 max-w-sm leading-relaxed">Ketik di salah satu field untuk langsung melihat hasil pencarian secara real-time.</p>
             </div>
           ) : searchResults.length > 0 ? (
