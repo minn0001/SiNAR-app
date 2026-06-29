@@ -19,10 +19,7 @@ import {
   Clock, 
   ExternalLink,
   ShieldAlert,
-  AlertTriangle,
-  ZoomIn,
-  ZoomOut,
-  Maximize2
+  AlertTriangle
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Archive, KategoriArsip, StatusArsip, User, UserRole } from "../types";
@@ -52,9 +49,7 @@ export default function ArchiveDetail({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleteError, setDeleteError] = useState("");
-
-  // Virtual Document Viewer zoom zoom states
-  const [viewerZoom, setViewerZoom] = useState(100);
+  
 
   if (!archive) {
     return (
@@ -379,25 +374,6 @@ printWindow.document.close();
                   <span className="text-[10px] text-[#718096] font-mono uppercase">{archive.fileDokumen.filename}</span>
                 </div>
               </div>
-
-              {/* Toolbar view */}
-              <div className="flex items-center gap-1 shrink-0">
-                <button
-                  onClick={() => setViewerZoom(Math.max(50, viewerZoom - 25))}
-                  className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition"
-                  title="Perkecil"
-                >
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <span className="text-xs font-bold text-[#0B1F3A] font-mono w-8 text-center">{viewerZoom}%</span>
-                <button
-                  onClick={() => setViewerZoom(Math.min(200, viewerZoom + 25))}
-                  className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition"
-                  title="Perbesar"
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </button>
-              </div>
             </div>
 
             {/* Embbed Render Area */}
@@ -588,7 +564,7 @@ printWindow.document.close();
                   return (
                     <div 
                       className="bg-white text-slate-850 shadow-2xl p-8 rounded border border-slate-300 relative transition-all duration-300 mx-auto"
-                      style={{ width: `${viewerZoom}%`, maxWidth: "750px" }}
+                      style={{ width: "100%", maxWidth: "750px" }}
                     >
                       {/* Decorative PDF elements */}
                       <div className="absolute top-2.5 right-3 text-[10px] text-red-500 font-bold border border-red-500 px-1 rounded transform rotate-12 scale-90 select-none no-print">
