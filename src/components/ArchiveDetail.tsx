@@ -381,7 +381,7 @@ printWindow.document.close();
               </div>
 
               {/* Toolbar view */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => setViewerZoom(Math.max(50, viewerZoom - 25))}
                   className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition"
@@ -389,7 +389,7 @@ printWindow.document.close();
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
-                <span className="text-xs font-bold text-[#0B1F3A] font-mono w-10 text-center">{viewerZoom}%</span>
+                <span className="text-xs font-bold text-[#0B1F3A] font-mono w-8 text-center">{viewerZoom}%</span>
                 <button
                   onClick={() => setViewerZoom(Math.min(200, viewerZoom + 25))}
                   className="p-1.5 bg-white hover:bg-[#FDF8F0] text-[#718096] hover:text-[#0B1F3A] rounded border border-[#D4B896] transition"
