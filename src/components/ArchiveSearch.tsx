@@ -13,22 +13,40 @@ import { Archive, KategoriArsip, StatusArsip } from "../types";
 interface ArchiveSearchProps {
   archives: Archive[];
   onNavigate: (page: string, activeId?: string | null) => void;
+  recentSearches?: string[];
+  onAddRecentSearch?: (q: string) => void;
+  searchState: {
+    nomorArsip: string;
+    judulArsip: string;
+    namaKlien: string;
+    lokasiFisik: string;
+    kategori: string;
+    statusArsip: string;
+    unitPengolah: string;
+    tanggalDari: string;
+    tanggalSampai: string;
+  };
+  onSearchStateChange: (state: any) => void;
 }
 
 export default function ArchiveSearch({
   archives,
   onNavigate,
+  searchState,
+  onSearchStateChange,
 }: ArchiveSearchProps) {
   
-  const [nomorArsip, setNomorArsip] = useState("");
-  const [judulArsip, setJudulArsip] = useState("");
-  const [namaKlien, setNamaKlien] = useState("");
-  const [lokasiFisik, setLokasiFisik] = useState("");
-  const [kategori, setKategori] = useState("Semua Kategori");
-  const [statusArsip, setStatusArsip] = useState("Semua Status");
-  const [unitPengolah, setUnitPengolah] = useState("Semua Unit");
-  const [tanggalDari, setTanggalDari] = useState("");
-  const [tanggalSampai, setTanggalSampai] = useState("");
+  const { nomorArsip, judulArsip, namaKlien, lokasiFisik, kategori, statusArsip, unitPengolah, tanggalDari, tanggalSampai } = searchState;
+
+  const setNomorArsip = (v: string) => onSearchStateChange({ ...searchState, nomorArsip: v });
+  const setJudulArsip = (v: string) => onSearchStateChange({ ...searchState, judulArsip: v });
+  const setNamaKlien = (v: string) => onSearchStateChange({ ...searchState, namaKlien: v });
+  const setLokasiFisik = (v: string) => onSearchStateChange({ ...searchState, lokasiFisik: v });
+  const setKategori = (v: string) => onSearchStateChange({ ...searchState, kategori: v });
+  const setStatusArsip = (v: string) => onSearchStateChange({ ...searchState, statusArsip: v });
+  const setUnitPengolah = (v: string) => onSearchStateChange({ ...searchState, unitPengolah: v });
+  const setTanggalDari = (v: string) => onSearchStateChange({ ...searchState, tanggalDari: v });
+  const setTanggalSampai = (v: string) => onSearchStateChange({ ...searchState, tanggalSampai: v });
   const [searchResults, setSearchResults] = useState<Archive[] | null>(null);
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
 
@@ -62,15 +80,17 @@ export default function ArchiveSearch({
   }, [nomorArsip, judulArsip, namaKlien, lokasiFisik, kategori, statusArsip, unitPengolah, tanggalDari, tanggalSampai]);
 
   const clearSearch = () => {
-    setNomorArsip("");
-    setJudulArsip("");
-    setNamaKlien("");
-    setLokasiFisik("");
-    setKategori("Semua Kategori");
-    setStatusArsip("Semua Status");
-    setUnitPengolah("Semua Unit");
-    setTanggalDari("");
-    setTanggalSampai("");
+    onSearchStateChange({
+      nomorArsip: "",
+      judulArsip: "",
+      namaKlien: "",
+      lokasiFisik: "",
+      kategori: "Semua Kategori",
+      statusArsip: "Semua Status",
+      unitPengolah: "Semua Unit",
+      tanggalDari: "",
+      tanggalSampai: "",
+    });
     setSearchResults(null);
     setActiveSearchTerm("");
   };
